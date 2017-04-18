@@ -5,8 +5,8 @@ Kinesis Streams
 [![npm version](https://badge.fury.io/js/kinesis-streams.svg)](https://badge.fury.io/js/kinesis-streams)
 [![Coverage Status](https://coveralls.io/repos/github/crccheck/kinesis-streams/badge.svg?branch=master)](https://coveralls.io/github/crccheck/kinesis-streams?branch=master)
 
-There once was a Kinesis readable stream without a home, and a Kinesis writable
-stream without a home, so now they're roommates.
+There once was a [Kinesis readable stream][kinesis-console-consumer] without a
+home, and a Kinesis writable stream without a home, so now they're roommates.
 
 Usage
 -----
@@ -18,9 +18,9 @@ Readable stream
 ---------------
 
     const AWS = require('aws-sdk')
-    const { KinesisStreamReader } = require('kinesis-streams')
+    const { KinesisReadable } = require('kinesis-streams')
     const client = AWS.Kinesis()
-    const reader = new KinesisStreamReader(client, streamName, options)
+    const reader = new KinesisReadable(client, streamName, options)
     reader.pipe(yourDestinationHere)
 
 ### Options
@@ -28,8 +28,7 @@ Readable stream
 * `options.interval: number` (default: `2000`) Milliseconds between each Kinesis read. Remember limit is 5 reads / second / shard
 * `options.parser: Function` If this is set, this function is applied to the data. Example:
 
-        const client = AWS.Kinesis()
-        const reader = new KinesisStreamReader(client, streamName, {parser: JSON.parse})
+        const reader = new KinesisReadable(client, streamName, {parser: JSON.parse})
         reader.on('data', console.log(data.id))
 
 * And any [getShardIterator] parameter
@@ -45,4 +44,5 @@ These events are emitted:
 
   [Kafka quickstart]: http://kafka.apache.org/documentation.html#quickstart_consume
   [getShardIterator]: http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Kinesis.html#getShardIterator-property
+  [kinesis-console-consumer]: https://github.com/crccheck/kinesis-console-consumer
   [kinesis-readable]: https://github.com/rclark/kinesis-readable
