@@ -12,7 +12,6 @@
     "pretest": "eslint lib test",
     "test": "istanbul cover _mocha",
     "tdd": "mocha --watch --reporter dot --bail",
-    "travisci": "npm run test -- --report lcovonly && cat ./coverage/lcov.info | coveralls",
     "changelog": "echo \"$(changelog-maker && cat CHANGELOG.md)\" > CHANGELOG.md"
   },
   "keywords": [
