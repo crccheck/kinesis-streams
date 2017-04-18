@@ -3,7 +3,7 @@
 const assert = require('assert')
 const sinon = require('sinon')
 
-const main = require('../index')
+const main = require('../lib/readable')
 
 // HELPERS
 //////////

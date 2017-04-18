@@ -1,36 +1,30 @@
 {
-  "name": "kinesis-console-consumer",
-  "version": "1.6.0",
+  "name": "kinesis-streams",
+  "version": "1.0.0",
   "description": "AWS Kinesis stream consumer for the console",
-  "main": "index.js",
+  "main": "lib/index.js",
   "engines": {
     "node": ">4.0"
   },
   "scripts": {
-    "start": "node index.js",
-    "lint": "eslint --ignore-path .gitignore .",
-    "pretest": "npm run lint",
+    "start": "node lib/index.js",
+    "lint": "eslint lib test",
+    "pretest": "eslint lib test",
     "test": "istanbul cover _mocha",
     "tdd": "mocha --watch --reporter dot --bail",
     "travisci": "npm run test -- --report lcovonly && cat ./coverage/lcov.info | coveralls",
     "changelog": "echo \"$(changelog-maker && cat CHANGELOG.md)\" > CHANGELOG.md"
   },
-  "bin": {
-    "kinesis-console-consumer": "./cli.js"
-  },
   "keywords": [
     "aws",
     "kinesis",
-    "stream",
-    "cli"
+    "stream"
   ],
   "author": "Chris Chang <c@crccheck.com> (http://crccheck.com/blog)",
   "license": "Apache-2.0",
   "dependencies": {
     "aws-sdk": "^2.16.0",
-    "commander": "^2.9.0",
-    "debug": "^2.6.1",
-    "update-notifier": "^2.1.0"
+    "debug": "^2.6.1"
   },
   "devDependencies": {
     "eslint": "^3.15.0",
@@ -43,10 +37,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/crccheck/kinesis-console-consumer.git"
+    "url": "git+https://github.com/crccheck/kinesis-streams.git"
   },
   "bugs": {
-    "url": "https://github.com/crccheck/kinesis-console-consumer/issues"
+    "url": "https://github.com/crccheck/kinesis-streams/issues"
   },
-  "homepage": "https://github.com/crccheck/kinesis-console-consumer#readme"
+  "homepage": "https://github.com/crccheck/kinesis-streams#readme"
 }
