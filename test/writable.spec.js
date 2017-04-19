@@ -5,7 +5,7 @@ const sinonChai = require('sinon-chai')
 const streamArray = require('stream-array')
 const _ = require('lodash')
 
-const { AWSPromise } = require('./')
+const AWSPromise = require('./').AWSPromise
 const recordsFixture = require('./fixture/records')
 const successResponseFixture = require('./fixture/success-response')
 const failedResponseFixture = require('./fixture/failed-response')

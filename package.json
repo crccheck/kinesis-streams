@@ -4,7 +4,7 @@
   "description": "Readable and writable streams for AWS Kinesis",
   "main": "lib/index.js",
   "engines": {
-    "node": ">4.0"
+    "node": ">6.0"
   },
   "scripts": {
     "start": "node lib/index.js",
@@ -24,18 +24,19 @@
   "author": "Chris Chang <c@crccheck.com> (http://crccheck.com/blog)",
   "license": "Apache-2.0",
   "dependencies": {
-    "aws-sdk": "^2.42.0",
     "debug": "^2.6.1",
     "flushwritable": "^1.0.0",
     "promise-retry": "^1.1.1"
   },
   "devDependencies": {
+    "aws-sdk": "^2.42.0",
     "chai": "^3.5.0",
     "eslint": "^3.15.0",
     "eslint-config-standard": "^6.2.0",
     "eslint-plugin-promise": "^3.4.2",
     "eslint-plugin-standard": "^2.0.1",
     "istanbul": "^0.4.5",
+    "lodash": "^4.17.4",
     "mocha": "^3.2.0",
     "sinon": "^2.1.0",
     "sinon-chai": "^2.9.0",
