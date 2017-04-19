@@ -23,7 +23,7 @@ const AWSPromise = {
 }
 
 
-describe('main', () => {
+describe('KinesisReadable', () => {
   let client
   let sandbox
 

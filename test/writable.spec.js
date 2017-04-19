@@ -4,12 +4,12 @@ const sinon = require('sinon')
 const sinonChai = require('sinon-chai')
 const streamArray = require('stream-array')
 const _ = require('lodash')
-const KinesisWritable = require('../')
 const recordsFixture = require('./fixture/records')
 const successResponseFixture = require('./fixture/success-response')
 const failedResponseFixture = require('./fixture/failed-response')
 const successAfterFailedResponseFixture = require('./fixture/success-after-failed-response')
 const writeFixture = require('./fixture/write-fixture')
+const { KinesisWritable } = require('../')
 
 chai.use(sinonChai)
 
