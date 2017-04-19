@@ -3,24 +3,8 @@
 const assert = require('assert')
 const sinon = require('sinon')
 
+const { AWSPromise } = require('./')
 const main = require('../lib/readable')
-
-// HELPERS
-//////////
-
-// Convenience wrapper around Promise to reduce test boilerplate
-const AWSPromise = {
-  resolve: (value) => {
-    return sinon.stub().returns({
-      promise: () => Promise.resolve(value),
-    })
-  },
-  reject: (value) => {
-    return sinon.stub().returns({
-      promise: () => Promise.reject(value),
-    })
-  },
-}
 
 
 describe('KinesisReadable', () => {
@@ -38,7 +22,7 @@ describe('KinesisReadable', () => {
 
   describe('getStreams', () => {
     it('returns data from AWS', () => {
-      client.listStreams = AWSPromise.resolve('dat data')
+      client.listStreams = AWSPromise.resolves('dat data')
       main.getStreams(client)
         .then((data) => {
           assert.strictEqual(data, 'dat data')
@@ -46,7 +30,7 @@ describe('KinesisReadable', () => {
     })
 
     it('handles errors', () => {
-      client.listStreams = AWSPromise.reject('lol error')
+      client.listStreams = AWSPromise.rejects('lol error')
       return main.getStreams(client)
         .then((data) => {
           assert.strictEqual(true, false)
@@ -59,7 +43,7 @@ describe('KinesisReadable', () => {
 
   describe('getShardId', () => {
     it('throws when there are no shards', () => {
-      client.describeStream = AWSPromise.resolve({StreamDescription: {Shards: []}})
+      client.describeStream = AWSPromise.resolves({StreamDescription: {Shards: []}})
       return main._getShardId(client)
         .then((data) => {
           assert.ok(false, 'This should never run')
@@ -70,7 +54,7 @@ describe('KinesisReadable', () => {
     })
 
     it('gets shard id', () => {
-      client.describeStream = AWSPromise.resolve({StreamDescription: {Shards: [{ShardId: 'shard id'}]}})
+      client.describeStream = AWSPromise.resolves({StreamDescription: {Shards: [{ShardId: 'shard id'}]}})
       return main._getShardId(client)
         .then((data) => {
           assert.deepEqual(data, ['shard id'])
@@ -78,7 +62,7 @@ describe('KinesisReadable', () => {
     })
 
     it('handles errors', () => {
-      client.describeStream = AWSPromise.reject('lol error')
+      client.describeStream = AWSPromise.rejects('lol error')
       return main._getShardId(client)
         .then((data) => {
           assert.strictEqual(true, false)
@@ -91,7 +75,7 @@ describe('KinesisReadable', () => {
 
   describe('getShardIterator', () => {
     it('gets shard iterator', () => {
-      client.getShardIterator = AWSPromise.resolve({ShardIterator: 'shard iterator'})
+      client.getShardIterator = AWSPromise.resolves({ShardIterator: 'shard iterator'})
       return main._getShardIterator(client)
         .then((data) => {
           assert.strictEqual(data, 'shard iterator')
@@ -99,7 +83,7 @@ describe('KinesisReadable', () => {
     })
 
     it('handles errors', () => {
-      client.getShardIterator = AWSPromise.reject('lol error')
+      client.getShardIterator = AWSPromise.rejects('lol error')
       return main._getShardIterator(client)
         .then((data) => {
           assert.strictEqual(true, false)
@@ -121,8 +105,8 @@ describe('KinesisReadable', () => {
 
     describe('_startKinesis', () => {
       it('passes shard iterator options ignoring extras', () => {
-        client.describeStream = AWSPromise.resolve({StreamDescription: {Shards: [{ShardId: 'shard id'}]}})
-        client.getShardIterator = AWSPromise.resolve({ShardIterator: 'shard iterator'})
+        client.describeStream = AWSPromise.resolves({StreamDescription: {Shards: [{ShardId: 'shard id'}]}})
+        client.getShardIterator = AWSPromise.resolves({ShardIterator: 'shard iterator'})
         sandbox.stub(main.KinesisReadable.prototype, 'readShard')
         const options = {
           foo: 'bar',
@@ -142,7 +126,7 @@ describe('KinesisReadable', () => {
       })
 
       it('emits error when there is an error', () => {
-        client.describeStream = AWSPromise.reject('lol error')
+        client.describeStream = AWSPromise.rejects('lol error')
         const reader = new main.KinesisReadable(client, 'stream name', {foo: 'bar'})
 
         reader.once('error', (err) => {
@@ -153,7 +137,7 @@ describe('KinesisReadable', () => {
       })
 
       xit('logs when there is an error', () => {
-        client.describeStream = AWSPromise.reject('lol error')
+        client.describeStream = AWSPromise.rejects('lol error')
         const reader = new main.KinesisReadable(client, 'stream name', {foo: 'bar'})
 
         return reader._startKinesis('stream name', {})

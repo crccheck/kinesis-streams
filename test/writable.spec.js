@@ -4,6 +4,8 @@ const sinon = require('sinon')
 const sinonChai = require('sinon-chai')
 const streamArray = require('stream-array')
 const _ = require('lodash')
+
+const { AWSPromise } = require('./')
 const recordsFixture = require('./fixture/records')
 const successResponseFixture = require('./fixture/success-response')
 const failedResponseFixture = require('./fixture/failed-response')
@@ -15,19 +17,6 @@ chai.use(sinonChai)
 
 const expect = chai.expect
 
-// Convenience wrapper around Promise to reduce test boilerplate
-const AWSPromise = {
-  resolves: (value) => {
-    return sinon.stub().returns({
-      promise: () => Promise.resolve(value),
-    })
-  },
-  rejects: (value) => {
-    return sinon.stub().returns({
-      promise: () => Promise.reject(value),
-    })
-  },
-}
 
 describe('KinesisWritable', function () {
   let client
