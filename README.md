@@ -14,6 +14,28 @@ Usage
     npm install [-g] kinesis-streams
 
 
+Writeable stream
+----------------
+
+    const AWS = require('aws-sdk')
+    const { KinesisWritable } = require('kinesis-streams')
+    const client = AWS.Kinesis()
+    const writable = new KinesisWritable(client, 'streamName', options)
+    inputStream.pipe(writable)
+
+
+### Options
+
+* `options.highWaterMark` (default: 16) Buffer this many records before writing to Kinesis
+* `options.logger` A [bunyan], [winston], or similar logger that has methods like `debug`, `error` and `info`
+* `options.maxRetries` (default: 3) How many times to attempt a failed Kinesis put
+* `options.retryTimeout` (default: 100) The initial retry delay in milliseconds
+* `options.wait` (default: 500) How many milliseconds it should periodically flush
+
+[bunyan]: https://www.npmjs.com/package/bunyan
+[winston]: https://www.npmjs.com/package/winston
+
+
 Readable stream
 ---------------
 
