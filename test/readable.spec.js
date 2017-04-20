@@ -147,11 +147,11 @@ describe('KinesisReadable', () => {
 
     describe('readShard', () => {
       it('exits when there is an error preserving iterator', () => {
-        client.getRecords = (params, cb) => cb('mock error')
+        client.getRecords = (params, cb) => cb(new Error('mock error'))
         const reader = new main.KinesisReadable(client, 'stream name', {foo: 'bar'})
 
         reader.once('error', (err) => {
-          assert.equal(err, 'mock error')
+          assert.equal(err.message, 'mock error')
         })
 
         reader.readShard('shard-iterator-1')
@@ -160,7 +160,7 @@ describe('KinesisReadable', () => {
       })
 
       it('exits when shard is closed', () => {
-        client.getRecords = (params, cb) => cb(undefined, {Records: []})
+        client.getRecords = (params, cb) => cb(null, {Records: []})
         const reader = new main.KinesisReadable(client, 'stream name', {foo: 'bar'})
 
         reader.once('error', () => {
@@ -182,7 +182,7 @@ describe('KinesisReadable', () => {
         getNextIterator.onFirstCall().returns('shard-iterator-4')
         getNextIterator.onSecondCall().returns(undefined)
         client.getRecords = (params, cb) =>
-          cb(undefined, {Records: [record], NextShardIterator: getNextIterator()})
+          cb(null, {Records: [record], NextShardIterator: getNextIterator()})
         const reader = new main.KinesisReadable(client, 'stream name', {foo: 'bar'})
 
         reader.once('error', () => {
@@ -206,7 +206,7 @@ describe('KinesisReadable', () => {
         }
         const getNextIterator = sinon.stub().returns(undefined)
         client.getRecords = (params, cb) =>
-          cb(undefined, {Records: [record], NextShardIterator: getNextIterator()})
+          cb(null, {Records: [record], NextShardIterator: getNextIterator()})
         const reader = new main.KinesisReadable(client, 'stream name', {
           parser: JSON.parse,
         })
@@ -230,7 +230,7 @@ describe('KinesisReadable', () => {
         }
         const getNextIterator = sinon.stub().returns(undefined)
         client.getRecords = (params, cb) =>
-          cb(undefined, {Records: [record], NextShardIterator: getNextIterator()})
+          cb(null, {Records: [record], NextShardIterator: getNextIterator()})
         const reader = new main.KinesisReadable(client, 'stream name', {
           parser: () => { throw new Error('lolwut') },
         })
