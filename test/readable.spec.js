@@ -1,3 +1,4 @@
+// @flow weak
 const assert = require('assert')
 const sinon = require('sinon')
 
@@ -134,6 +135,7 @@ describe('KinesisReadable', () => {
         return reader._startKinesis('stream name', {})
       })
 
+      // $FlowFixMe
       xit('logs when there is an error', () => {
         client.describeStream = AWSPromise.rejects('lol error')
         const reader = new main.KinesisReadable(client, 'stream name', {foo: 'bar'})
