@@ -27,7 +27,7 @@ Writeable stream
 ### Options
 
 * `options.highWaterMark` (default: 16) Buffer this many records before writing to Kinesis
-* `options.logger` A [bunyan], [winston], or similar logger that has methods like `debug`, `error` and `info`
+* `options.logger` [bunyan], [winston], or logger with `debug`, `error` and `info`
 * `options.maxRetries` (default: 3) How many times to attempt a failed Kinesis put
 * `options.retryTimeout` (default: 100) The initial retry delay in milliseconds
 * `options.wait` (default: 500) How many milliseconds it should periodically flush
