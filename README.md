@@ -8,6 +8,7 @@ Kinesis Streams
 There once was a [Kinesis readable stream][kinesis-console-consumer] without a
 home, and a Kinesis writable stream without a home, so now they're roommates.
 
+
 Usage
 -----
 
@@ -22,7 +23,6 @@ Writeable stream
     const client = AWS.Kinesis()
     const writable = new KinesisWritable(client, 'streamName', options)
     inputStream.pipe(writable)
-
 
 ### Options
 
@@ -60,14 +60,18 @@ These events are emitted:
 
         reader.on('checkpoint', (sequenceNumber: string) => {})
 
-## Prior art
+
+Prior art
+---------
 
 The writable stream is based on the interface of [kinesis-write-stream]. The
 `checkpoint` event in readable stream is based on [kinesis-readable]. The
 readable stream was originally written as a proof of concept in
 [kinesis-console-consumer].
 
-## License
+
+License
+-------
 
 This package is licensed under Apache License 2.0, but the
 `tests/writable.spec.js` and `test/fixture/*` are originally from
