@@ -1,0 +1,13 @@
+{
+    "FailedRecordCount": 2,
+    "Records": [
+        { "SequenceNumber": "1111",
+          "ShardId": "test-0123" },
+        { "ErrorCode": "ProvisionedThroughputExceededException",
+          "ErrorMessage": "Rate exceeded for shard ..." },
+        { "SequenceNumber": "2222",
+          "ShardId": "test-0123" },
+        { "ErrorCode": "ProvisionedThroughputExceededException",
+          "ErrorMessage": "Rate exceeded for shard ..." }
+    ]
+}

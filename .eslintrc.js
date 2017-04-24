@@ -10,7 +10,7 @@ module.exports = {
     'no-multiple-empty-lines': ['error', {max: 2}],
     // This is often done in dev, and Uglify will clean it for prod anyways
     'no-unreachable': 'warn',
-    // Lets you write more legible comments
-    'spaced-comment': ['error', 'always', {exceptions: ['/']}],
+    // Allow underlines and Flow comment syntax
+    'spaced-comment': ['error', 'always', {exceptions: ['/'], markers: [':', '::']}]
   }
 }

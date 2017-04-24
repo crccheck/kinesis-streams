@@ -1,0 +1,9 @@
+{
+    "FailedRecordCount": 0,
+    "Records": [
+        { "SequenceNumber": "2222",
+          "ShardId": "test-0123" },
+        { "SequenceNumber": "4444",
+          "ShardId": "test-0123" }
+    ]
+}
