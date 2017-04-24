@@ -32,9 +32,6 @@ Writeable stream
 * `options.retryTimeout` (default: 100) The initial retry delay in milliseconds
 * `options.wait` (default: 500) How many milliseconds it should periodically flush
 
-[bunyan]: https://www.npmjs.com/package/bunyan
-[winston]: https://www.npmjs.com/package/winston
-
 
 Readable stream
 ---------------
@@ -59,12 +56,28 @@ Readable stream
 
 These events are emitted:
 
-* `checkpoint` Inspired by [kinesis-readable], this fires when data is received so you can keep track of the last successful sequence read:
+* `checkpoint` This fires when data is received so you can keep track of the last successful sequence read:
 
         reader.on('checkpoint', (sequenceNumber: string) => {})
 
+## Prior art
 
-  [Kafka quickstart]: http://kafka.apache.org/documentation.html#quickstart_consume
-  [getShardIterator]: http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Kinesis.html#getShardIterator-property
-  [kinesis-console-consumer]: https://github.com/crccheck/kinesis-console-consumer
-  [kinesis-readable]: https://github.com/rclark/kinesis-readable
+The writable stream is based on the interface of [kinesis-write-stream]. The
+`checkpoint` event in readable stream is based on [kinesis-readable]. The
+readable stream was originally written as a proof of concept in
+[kinesis-console-consumer].
+
+## License
+
+This package is licensed under Apache License 2.0, but the
+`tests/writable.spec.js` and `test/fixture/*` are originally from
+[kinesis-write-stream] MIT licensed from Espen Volden.
+
+
+[bunyan]: https://www.npmjs.com/package/bunyan
+[getShardIterator]: http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Kinesis.html#getShardIterator-property
+[Kafka quickstart]: http://kafka.apache.org/documentation.html#quickstart_consume
+[kinesis-console-consumer]: https://github.com/crccheck/kinesis-console-consumer
+[kinesis-readable]: https://github.com/rclark/kinesis-readable
+[kinesis-write-stream]: https://github.com/voldern/kinesis-write-stream
+[winston]: https://www.npmjs.com/package/winston
