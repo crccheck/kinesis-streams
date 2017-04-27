@@ -26,8 +26,8 @@ Writeable stream
 
 ### Options
 
+* `options.logger` ([optional](#loggers)) [bunyan], [winston], or logger with `debug`, `error` and `info`
 * `options.highWaterMark` (default: 16) Buffer this many records before writing to Kinesis
-* `options.logger` [bunyan], [winston], or logger with `debug`, `error` and `info`
 * `options.maxRetries` (default: 3) How many times to attempt a failed Kinesis put
 * `options.retryTimeout` (default: 100) The initial retry delay in milliseconds
 * `options.wait` (default: 500) How many milliseconds it should periodically flush
@@ -44,7 +44,8 @@ Readable stream
 
 ### Options
 
-* `options.interval: number` (default: `2000`) Milliseconds between each Kinesis read. Remember limit is 5 reads / second / shard
+* `options.logger` ([optional](#loggers)) [bunyan], [winston], or logger with `debug`, `error` and `info`
+* `options.interval: number` (default: `2000`) Milliseconds between each Kinesis read. The AWS limit is 5 reads / second / shard
 * `options.parser: Function` If this is set, this function is applied to the data. Example:
 
         const reader = new KinesisReadable(client, streamName, {parser: JSON.parse})
@@ -59,6 +60,14 @@ These events are emitted:
 * `checkpoint` This fires when data is received so you can keep track of the last successful sequence read:
 
         reader.on('checkpoint', (sequenceNumber: string) => {})
+
+
+Loggers
+-------
+
+`KinesisWritable` and `KinesisReadable` both take an optional `logger` option.
+If this is omitted, the [debug] logger will be used instead. To see output, set
+`DEBUG=kinesis-streams:*` in your environment.
 
 
 Prior art
@@ -78,10 +87,11 @@ This package is licensed under Apache License 2.0, but the
 [kinesis-write-stream] MIT licensed from Espen Volden.
 
 
-[bunyan]: https://www.npmjs.com/package/bunyan
+[bunyan]: https://github.com/trentm/node-bunyan
+[debug]: https://github.com/visionmedia/debug
 [getShardIterator]: http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/Kinesis.html#getShardIterator-property
 [Kafka quickstart]: http://kafka.apache.org/documentation.html#quickstart_consume
 [kinesis-console-consumer]: https://github.com/crccheck/kinesis-console-consumer
 [kinesis-readable]: https://github.com/rclark/kinesis-readable
 [kinesis-write-stream]: https://github.com/voldern/kinesis-write-stream
-[winston]: https://www.npmjs.com/package/winston
+[winston]: https://github.com/winstonjs/winston
