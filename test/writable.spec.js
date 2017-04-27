@@ -47,7 +47,7 @@ describe('KinesisWritable', function () {
   })
 
   describe('constructor', function () {
-    it('should throw error on missing client', function () {
+    it('throws on missing client', () => {
       try {
         new KinesisWritable()
         assert.ok(false)
@@ -56,7 +56,7 @@ describe('KinesisWritable', function () {
       }
     })
 
-    it('should throw error on missing streamName', function () {
+    it('throws on missing streamName', () => {
       try {
         new KinesisWritable({})
         assert.ok(false)
