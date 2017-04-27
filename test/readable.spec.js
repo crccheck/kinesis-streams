@@ -73,32 +73,11 @@ describe('KinesisReadable', () => {
     })
   })
 
-  describe('getShardIterator', () => {
-    it('gets shard iterator', () => {
-      client.getShardIterator = AWSPromise.resolves({ShardIterator: 'shard iterator'})
-      return main._getShardIterator(client)
-        .then((data) => {
-          assert.strictEqual(data, 'shard iterator')
-        })
-    })
-
-    it('handles errors', () => {
-      client.getShardIterator = AWSPromise.rejects('lol error')
-      return main._getShardIterator(client)
-        .then((data) => {
-          assert.strictEqual(true, false)
-        })
-        .catch((err) => {
-          assert.strictEqual(err, 'lol error')
-        })
-    })
-  })
-
   describe('KinesisReadable', () => {
     describe('constructor', () => {
       it('throws on missing client', () => {
         try {
-          new main.KinesisReadable()
+          new main.KinesisReadable(undefined, 'stream-name')
           assert.ok(false)
         } catch (err) {
           assert.equal(err.message, 'client is required')
@@ -107,7 +86,8 @@ describe('KinesisReadable', () => {
 
       it('throws on missing streamName', () => {
         try {
-          new main.KinesisReadable({})
+          // $FlowFixMe deliberate error
+          new main.KinesisReadable(client, undefined)
           assert.ok(false)
         } catch (err) {
           assert.equal(err.message, 'streamName is required')
@@ -115,11 +95,36 @@ describe('KinesisReadable', () => {
       })
 
       it('sets arguments', () => {
-        const reader = new main.KinesisReadable(client, 'stream name', {foo: 'bar'})
+        const reader = new main.KinesisReadable(client, 'stream-name', {foo: 'bar'})
         assert.ok(reader)
-        assert.equal(reader.streamName, 'stream name')
+        assert.equal(reader.streamName, 'stream-name')
         assert.equal(reader.options.foo, 'bar')
         assert.equal(reader.options.interval, 2000)
+      })
+    })
+
+    describe('getShardIterator', () => {
+      it('gets shard iterator', () => {
+        const reader = new main.KinesisReadable(client, 'stream-name')
+        client.getShardIterator = AWSPromise.resolves({ShardIterator: 'shard iterator'})
+
+        return reader.getShardIterator('shard-id')
+          .then((data) => {
+            assert.strictEqual(data, 'shard iterator')
+          })
+      })
+
+      it('handles errors', () => {
+        const reader = new main.KinesisReadable(client, 'stream-name')
+        client.getShardIterator = AWSPromise.rejects('lol error')
+
+        return reader.getShardIterator('shard-id')
+          .then((data) => {
+            assert.ok(false)
+          })
+          .catch((err) => {
+            assert.strictEqual(err, 'lol error')
+          })
       })
     })
 
