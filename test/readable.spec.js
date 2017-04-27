@@ -1,4 +1,5 @@
 // @flow weak
+/* eslint-disable no-new */
 const assert = require('assert')
 const sinon = require('sinon')
 
@@ -94,12 +95,32 @@ describe('KinesisReadable', () => {
   })
 
   describe('KinesisReadable', () => {
-    it('constructor sets arguments', () => {
-      const reader = new main.KinesisReadable(client, 'stream name', {foo: 'bar'})
-      assert.ok(reader)
-      assert.equal(reader.streamName, 'stream name')
-      assert.equal(reader.options.foo, 'bar')
-      assert.equal(reader.options.interval, 2000)
+    describe('constructor', () => {
+      it('throws on missing client', () => {
+        try {
+          new main.KinesisReadable()
+          assert.ok(false)
+        } catch (err) {
+          assert.equal(err.message, 'client is required')
+        }
+      })
+
+      it('throws on missing streamName', () => {
+        try {
+          new main.KinesisReadable({})
+          assert.ok(false)
+        } catch (err) {
+          assert.equal(err.message, 'streamName is required')
+        }
+      })
+
+      it('sets arguments', () => {
+        const reader = new main.KinesisReadable(client, 'stream name', {foo: 'bar'})
+        assert.ok(reader)
+        assert.equal(reader.streamName, 'stream name')
+        assert.equal(reader.options.foo, 'bar')
+        assert.equal(reader.options.interval, 2000)
+      })
     })
 
     describe('_startKinesis', () => {
