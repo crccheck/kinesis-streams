@@ -12,7 +12,8 @@
     "pretest": "eslint lib test",
     "test": "istanbul cover _mocha",
     "tdd": "mocha --watch --reporter dot --bail",
-    "changelog": "echo \"$(changelog-maker && cat CHANGELOG.md)\" > CHANGELOG.md"
+    "changelog": "echo \"$(changelog-maker && cat CHANGELOG.md)\" > CHANGELOG.md",
+    "prepush" "npm test"
   },
   "keywords": [
     "aws",
@@ -38,6 +39,7 @@
     "eslint-plugin-promise": "^3.5.0",
     "eslint-plugin-standard": "^3.0.1",
     "flow-bin": "^0.44.2",
+    "husky": "^0.13.3",
     "istanbul": "^0.4.5",
     "lodash": "^4.17.4",
     "mocha": "^3.3.0",
