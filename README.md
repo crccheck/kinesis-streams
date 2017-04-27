@@ -8,6 +8,7 @@ Kinesis Streams
 There once was a [Kinesis readable stream][kinesis-console-consumer] without a
 home, and a Kinesis writable stream without a home, so now they're roommates.
 
+
 Usage
 -----
 
@@ -23,11 +24,10 @@ Writeable stream
     const writable = new KinesisWritable(client, 'streamName', options)
     inputStream.pipe(writable)
 
-
 ### Options
 
 * `options.highWaterMark` (default: 16) Buffer this many records before writing to Kinesis
-* `options.logger` A [bunyan], [winston], or similar logger that has methods like `debug`, `error` and `info`
+* `options.logger` [bunyan], [winston], or logger with `debug`, `error` and `info`
 * `options.maxRetries` (default: 3) How many times to attempt a failed Kinesis put
 * `options.retryTimeout` (default: 100) The initial retry delay in milliseconds
 * `options.wait` (default: 500) How many milliseconds it should periodically flush
@@ -60,14 +60,18 @@ These events are emitted:
 
         reader.on('checkpoint', (sequenceNumber: string) => {})
 
-## Prior art
+
+Prior art
+---------
 
 The writable stream is based on the interface of [kinesis-write-stream]. The
 `checkpoint` event in readable stream is based on [kinesis-readable]. The
 readable stream was originally written as a proof of concept in
 [kinesis-console-consumer].
 
-## License
+
+License
+-------
 
 This package is licensed under Apache License 2.0, but the
 `tests/writable.spec.js` and `test/fixture/*` are originally from

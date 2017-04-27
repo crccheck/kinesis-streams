@@ -1,6 +1,6 @@
 {
   "name": "kinesis-streams",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Readable and writable streams for AWS Kinesis",
   "main": "lib/index.js",
   "engines": {
@@ -12,7 +12,8 @@
     "pretest": "eslint lib test",
     "test": "istanbul cover _mocha",
     "tdd": "mocha --watch --reporter dot --bail",
-    "changelog": "echo \"$(changelog-maker && cat CHANGELOG.md)\" > CHANGELOG.md"
+    "changelog": "echo \"$(changelog-maker && cat CHANGELOG.md)\" > CHANGELOG.md",
+    "prepush" "npm test"
   },
   "keywords": [
     "aws",
@@ -29,7 +30,7 @@
     "promise-retry": "^1.1.1"
   },
   "devDependencies": {
-    "aws-sdk": "^2.45.0",
+    "aws-sdk": "^2.46.0",
     "chai": "^3.5.0",
     "eslint": "^3.15.0",
     "eslint-config-standard": "^10.2.1",
@@ -37,9 +38,11 @@
     "eslint-plugin-node": "^4.2.2",
     "eslint-plugin-promise": "^3.5.0",
     "eslint-plugin-standard": "^3.0.1",
+    "flow-bin": "^0.44.2",
+    "husky": "^0.13.3",
     "istanbul": "^0.4.5",
     "lodash": "^4.17.4",
-    "mocha": "^3.2.0",
+    "mocha": "^3.3.0",
     "sinon": "^2.1.0",
     "sinon-chai": "^2.9.0",
     "stream-array": "^1.1.2"

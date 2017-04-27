@@ -1,4 +1,6 @@
+// @flow weak
 /* eslint-disable no-new,no-unused-expressions */
+const assert = require('assert')
 const chai = require('chai')
 const sinon = require('sinon')
 const sinonChai = require('sinon-chai')
@@ -46,15 +48,21 @@ describe('KinesisWritable', function () {
 
   describe('constructor', function () {
     it('should throw error on missing client', function () {
-      expect(function () {
+      try {
         new KinesisWritable()
-      }).to.Throw(Error, 'client is required')
+        assert.ok(false)
+      } catch (err) {
+        assert.equal(err.message, 'client is required')
+      }
     })
 
     it('should throw error on missing streamName', function () {
-      expect(function () {
+      try {
         new KinesisWritable({})
-      }).to.Throw(Error, 'streamName is required')
+        assert.ok(false)
+      } catch (err) {
+        assert.equal(err.message, 'streamName is required')
+      }
     })
 
     it('should correct highWaterMark above 500', function () {
@@ -64,16 +72,17 @@ describe('KinesisWritable', function () {
   })
 
   describe('getPartitionKey', function () {
+    // $FlowFixMe
     xit('should return a random partition key padded to 4 digits', function () {
       var kinesis = new KinesisWritable({}, 'foo')
 
       sandbox.stub(_, 'random').returns(10)
 
-      expect(kinesis.getPartitionKey()).to.eq('0010')
+      assert.equal(kinesis.getPartitionKey(), '0010')
 
       _.random.returns(1000)
 
-      expect(kinesis.getPartitionKey()).to.eq('1000')
+      assert.equal(kinesis.getPartitionKey(), '0010')
     })
 
     it('should be called with the current record being added', function (done) {
@@ -98,7 +107,7 @@ describe('KinesisWritable', function () {
       sandbox.spy(stream, 'getPartitionKey')
 
       stream.on('finish', () => {
-        expect(stream.getPartitionKey).to.have.returned('custom-partition')
+        assert.equal(stream.getPartitionKey(), 'custom-partition')
         done()
       })
 
@@ -178,7 +187,7 @@ describe('KinesisWritable', function () {
       client.putRecords.onCall(2).returns({promise: () => Promise.resolve(successResponseFixture)})
 
       stream.on('finish', () => {
-        expect(client.putRecords).to.have.been.calledThrice
+        assert.equal(client.putRecords.callCount, 3)
 
         expect(client.putRecords.secondCall).to.have.been.calledWith({
           Records: writeFixture,
@@ -202,7 +211,7 @@ describe('KinesisWritable', function () {
       })
       stream.on('kinesis.putRecords', () => putRecordsCount++)
       stream.on('finish', () => {
-        expect(client.putRecords).to.have.been.calledTwice
+        assert.equal(client.putRecords.callCount, 2)
 
         expect(client.putRecords.secondCall).to.have.been.calledWith({
           Records: [{ Data: '{"someKey":2}', PartitionKey: '1234' }, { Data: '{"someKey":4}', PartitionKey: '1234' }],
