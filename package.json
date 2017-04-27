@@ -13,7 +13,7 @@
     "test": "istanbul cover _mocha",
     "tdd": "mocha --watch --reporter dot --bail",
     "changelog": "echo \"$(changelog-maker && cat CHANGELOG.md)\" > CHANGELOG.md",
-    "prepush" "npm test"
+    "prepush": "npm test"
   },
   "keywords": [
     "aws",
