@@ -41,38 +41,6 @@ describe('KinesisReadable', () => {
     })
   })
 
-  describe('getShardId', () => {
-    it('throws when there are no shards', () => {
-      client.describeStream = AWSPromise.resolves({StreamDescription: {Shards: []}})
-      return main._getShardId(client)
-        .then((data) => {
-          assert.ok(false, 'This should never run')
-        })
-        .catch((err) => {
-          assert.strictEqual(err.message, 'No shards!')
-        })
-    })
-
-    it('gets shard id', () => {
-      client.describeStream = AWSPromise.resolves({StreamDescription: {Shards: [{ShardId: 'shard id'}]}})
-      return main._getShardId(client)
-        .then((data) => {
-          assert.deepEqual(data, ['shard id'])
-        })
-    })
-
-    it('handles errors', () => {
-      client.describeStream = AWSPromise.rejects('lol error')
-      return main._getShardId(client)
-        .then((data) => {
-          assert.ok(false)
-        })
-        .catch((err) => {
-          assert.strictEqual(err, 'lol error')
-        })
-    })
-  })
-
   describe('constructor', () => {
     it('throws on missing client', () => {
       try {
@@ -100,6 +68,44 @@ describe('KinesisReadable', () => {
       assert.equal(reader.streamName, 'stream-name')
       assert.equal(reader.options.foo, 'bar')
       assert.equal(reader.options.interval, 2000)
+    })
+  })
+
+  describe('getShardId', () => {
+    it('throws when there are no shards', () => {
+      client.describeStream = AWSPromise.resolves({StreamDescription: {Shards: []}})
+      const reader = new main.KinesisReadable(client, 'stream-name')
+
+      return reader.getShardId(client)
+        .then((data) => {
+          assert.ok(false)
+        })
+        .catch((err) => {
+          assert.strictEqual(err.message, 'No shards!')
+        })
+    })
+
+    it('gets shard id', () => {
+      client.describeStream = AWSPromise.resolves({StreamDescription: {Shards: [{ShardId: 'shard-id'}]}})
+      const reader = new main.KinesisReadable(client, 'stream-name')
+
+      return reader.getShardId()
+        .then((data) => {
+          assert.deepEqual(data, ['shard-id'])
+        })
+    })
+
+    it('handles errors', () => {
+      client.describeStream = AWSPromise.rejects('lol error')
+      const reader = new main.KinesisReadable(client, 'stream-name')
+
+      return reader.getShardId()
+        .then((data) => {
+          assert.ok(false)
+        })
+        .catch((err) => {
+          assert.strictEqual(err, 'lol error')
+        })
     })
   })
 
