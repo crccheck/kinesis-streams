@@ -20,7 +20,7 @@ Writeable stream
 
     const AWS = require('aws-sdk')
     const { KinesisWritable } = require('kinesis-streams')
-    const client = AWS.Kinesis()
+    const client = new AWS.Kinesis()
     const writable = new KinesisWritable(client, 'streamName', options)
     inputStream.pipe(writable)
 
@@ -38,7 +38,7 @@ Readable stream
 
     const AWS = require('aws-sdk')
     const { KinesisReadable } = require('kinesis-streams')
-    const client = AWS.Kinesis()
+    const client = new AWS.Kinesis()
     const reader = new KinesisReadable(client, streamName, options)
     reader.pipe(yourDestinationHere)
 
