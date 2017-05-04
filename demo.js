@@ -44,4 +44,12 @@ class NoiseReadable extends Readable {
 const client = new AWS.Kinesis()
 const stream = new KinesisWritable(client, process.argv[2] || 'demo', {logger, wait: WAIT})
 
+stream.on('kinesis.putRecords', (response) => {
+  /* eslint-disable no-unused-vars */
+  const failedCount = response.FailedRecordCount
+  const succcessCount = response.Records.length - response.FailedRecordCount
+  const queueDepth = stream.queue.length
+  /* eslint-enable */
+})
+
 new NoiseReadable().pipe(stream)
