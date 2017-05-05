@@ -172,7 +172,8 @@ describe('KinesisWritable', function () {
       client.putRecords = AWSPromise.rejects('Fail')
 
       stream.on('error', (err) => {
-        expect(err.message).to.equal('Fail')
+        assert.strictEqual(err.message, 'Fail')
+        assert.strictEqual(stream.queue.length, 1)
 
         done()
       })

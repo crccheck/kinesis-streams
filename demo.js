@@ -51,5 +51,11 @@ stream.on('kinesis.putRecords', (response) => {
   const queueDepth = stream.queue.length
   /* eslint-enable */
 })
+stream.on('error', () => {
+  /* eslint-disable no-unused-vars */
+  const errorCount = 1
+  const queueDepth = stream.queue.length
+  /* eslint-enable */
+})
 
 new NoiseReadable().pipe(stream)
