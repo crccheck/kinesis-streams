@@ -32,6 +32,14 @@ Writeable stream
 * `options.retryTimeout` (default: 100) The initial retry delay in milliseconds
 * `options.wait` (default: 500) How many milliseconds it should periodically flush
 
+### Custom events
+
+These events are emitted:
+
+* `kinesis.putRecords` Fires after records are put and the response is processed. You'll get the original response from AWS. See [`demo.js`](./demo.js) for an example of how to interpret it
+
+        reader.on('kinesis.putRecords', (response: {FailedRecordCount: number, Records: Record[]}) => {})
+
 
 Readable stream
 ---------------
