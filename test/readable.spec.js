@@ -6,7 +6,6 @@ const sinon = require('sinon')
 const { AWSPromise } = require('./')
 const main = require('../lib/readable')
 
-
 describe('KinesisReadable', () => {
   let client
   let sandbox
@@ -181,29 +180,32 @@ describe('KinesisReadable', () => {
 
   describe('readShard', () => {
     it('exits when there is an error preserving iterator', () => {
-      client.getRecords = (params, cb) => cb(new Error('mock error'))
+      client.getRecords = sinon.stub().returns({promise: () => Promise.reject(new Error('mock error'))})
       const reader = new main.KinesisReadable(client, 'stream name', {foo: 'bar'})
 
       reader.once('error', (err) => {
         assert.equal(err.message, 'mock error')
       })
 
-      reader.readShard('shard-iterator-1')
-
-      assert(reader.iterators.has('shard-iterator-1'))
+      return reader.readShard('shard-iterator-1')
+        .then(() => {
+          assert(reader.iterators.has('shard-iterator-1'))
+        })
     })
 
     it('exits when shard is closed', () => {
-      client.getRecords = (params, cb) => cb(null, {Records: []})
+      client.getRecords = sinon.stub().returns({promise: () => Promise.resolve({Records: []})})
       const reader = new main.KinesisReadable(client, 'stream name', {foo: 'bar'})
 
       reader.once('error', () => {
         assert.ok(false, 'this should never run')
       })
 
-      reader.readShard('shard-iterator-2')
 
-      assert.equal(reader.iterators.size, 0)
+      return reader.readShard('shard-iterator-2')
+        .then(() => {
+          assert.equal(reader.iterators.size, 0)
+        })
     })
 
     it('continues to read open shard', () => {
@@ -236,23 +238,22 @@ describe('KinesisReadable', () => {
         Data: '{"foo":"bar"}',
         SequenceNumber: 'seq-1',
       }
-      const getNextIterator = sinon.stub().returns(undefined)
-      client.getRecords = (params, cb) =>
-        cb(null, {Records: [record], NextShardIterator: getNextIterator()})
+      client.getRecords = sinon.stub().returns({ promise: () => Promise.resolve({ Records: [record] }) })
       const reader = new main.KinesisReadable(client, 'stream name', {
         parser: JSON.parse,
       })
 
-      reader.readShard('shard-iterator-5')
-
-      assert.ok(reader._readableState.objectMode)
-      assert.equal(reader._readableState.buffer.length, 1)
-      if (reader._readableState.buffer.head) {
-        assert.deepEqual(reader._readableState.buffer.head.data, {foo: 'bar'})
-      } else {
-        // NODE4
-        assert.deepEqual(reader._readableState.buffer[0], {foo: 'bar'})
-      }
+      return reader.readShard('shard-iterator-5')
+        .then(() => {
+          assert.ok(reader._readableState.objectMode)
+          assert.equal(reader._readableState.buffer.length, 1)
+          if (reader._readableState.buffer.head) {
+            assert.deepEqual(reader._readableState.buffer.head.data, {foo: 'bar'})
+          } else {
+            // NODE4
+            assert.deepEqual(reader._readableState.buffer[0], {foo: 'bar'})
+          }
+        })
     })
 
     it('parser exceptions are passed through', () => {
@@ -260,19 +261,18 @@ describe('KinesisReadable', () => {
         Data: '{"foo":"bar"}',
         SequenceNumber: 'seq-1',
       }
-      const getNextIterator = sinon.stub().returns(undefined)
-      client.getRecords = (params, cb) =>
-        cb(null, {Records: [record], NextShardIterator: getNextIterator()})
+      client.getRecords = sinon.stub().returns({ promise: () => Promise.resolve({ Records: [record] }) })
       const reader = new main.KinesisReadable(client, 'stream name', {
         parser: () => { throw new Error('lolwut') },
       })
 
-      try {
-        reader.readShard('shard-iterator-6')
-        assert(false, 'reader should have thrown')
-      } catch (err) {
-        assert.equal(err.message, 'lolwut')
-      }
+      return reader.readShard('shard-iterator-6')
+        .then(() => {
+          assert(false, 'reader should have thrown')
+        })
+        .catch((err) => {
+          assert.equal(err.message, 'lolwut')
+        })
     })
   })
 
