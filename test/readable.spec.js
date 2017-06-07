@@ -6,6 +6,31 @@ const sinon = require('sinon')
 const { AWSPromise } = require('./')
 const main = require('../lib/readable')
 
+let _expected = 0
+
+function expect (n/*: number */) {
+  _expected = n
+}
+
+const methods = ['ok', 'equal', 'deepEqual', 'strictEqual']
+
+beforeEach(function () {
+  methods.forEach((x) => assert[x].restore && assert[x].restore())  // needed when running --watch
+  methods.forEach((x) => sinon.spy(assert, x))
+  this.actual = 0
+  _expected = 0
+})
+
+afterEach(function () {
+  // assert(_expected, 'Expected at least one assertion')
+  if (_expected) {
+    const actual = methods.reduce((a, b) => assert[b].callCount + a, 0)
+    // eslint-disable-next-line no-mixed-operators
+    assert.equal(actual, _expected, `Expected ${_expected} assertion${_expected !== 1 && 's' || ''}, but saw ${actual}`)
+  }
+  methods.forEach((x) => assert[x].restore())
+})
+
 describe('KinesisReadable', () => {
   let client
   let sandbox
@@ -21,6 +46,7 @@ describe('KinesisReadable', () => {
 
   describe('getStreams', () => {
     it('returns data from AWS', () => {
+      expect(1)
       client.listStreams = AWSPromise.resolves('dat data')
       main.getStreams(client)
         .then((data) => {
@@ -29,6 +55,7 @@ describe('KinesisReadable', () => {
     })
 
     it('handles errors', () => {
+      expect(1)
       client.listStreams = AWSPromise.rejects('lol error')
       return main.getStreams(client)
         .then((data) => {
@@ -42,6 +69,7 @@ describe('KinesisReadable', () => {
 
   describe('constructor', () => {
     it('throws on missing client', () => {
+      expect(1)
       try {
         // $FlowFixMe deliberate error
         new main.KinesisReadable(undefined, 'stream-name')
@@ -52,6 +80,7 @@ describe('KinesisReadable', () => {
     })
 
     it('throws on missing streamName', () => {
+      expect(1)
       try {
         // $FlowFixMe deliberate error
         new main.KinesisReadable(client, undefined)
@@ -62,6 +91,7 @@ describe('KinesisReadable', () => {
     })
 
     it('sets arguments', () => {
+      expect(4)
       const reader = new main.KinesisReadable(client, 'stream-name', {foo: 'bar'})
       assert.ok(reader)
       assert.equal(reader.streamName, 'stream-name')
@@ -72,6 +102,7 @@ describe('KinesisReadable', () => {
 
   describe('getShardId', () => {
     it('throws when there are no shards', () => {
+      expect(1)
       client.describeStream = AWSPromise.resolves({StreamDescription: {Shards: []}})
       const reader = new main.KinesisReadable(client, 'stream-name')
 
@@ -85,6 +116,7 @@ describe('KinesisReadable', () => {
     })
 
     it('gets shard id', () => {
+      expect(1)
       client.describeStream = AWSPromise.resolves({StreamDescription: {Shards: [{ShardId: 'shard-id'}]}})
       const reader = new main.KinesisReadable(client, 'stream-name')
 
@@ -95,6 +127,7 @@ describe('KinesisReadable', () => {
     })
 
     it('handles errors', () => {
+      expect(1)
       client.describeStream = AWSPromise.rejects('lol error')
       const reader = new main.KinesisReadable(client, 'stream-name')
 
@@ -110,6 +143,7 @@ describe('KinesisReadable', () => {
 
   describe('getShardIterator', () => {
     it('gets shard iterator', () => {
+      expect(1)
       const reader = new main.KinesisReadable(client, 'stream-name')
       client.getShardIterator = AWSPromise.resolves({ShardIterator: 'shard iterator'})
 
@@ -120,6 +154,7 @@ describe('KinesisReadable', () => {
     })
 
     it('handles errors', () => {
+      expect(1)
       const reader = new main.KinesisReadable(client, 'stream-name')
       client.getShardIterator = AWSPromise.rejects('lol error')
 
@@ -135,6 +170,7 @@ describe('KinesisReadable', () => {
 
   describe('_startKinesis', () => {
     it('passes shard iterator options ignoring extras', () => {
+      expect(4)
       client.describeStream = AWSPromise.resolves({StreamDescription: {Shards: [{ShardId: 'shard id'}]}})
       client.getShardIterator = AWSPromise.resolves({ShardIterator: 'shard iterator'})
       sandbox.stub(main.KinesisReadable.prototype, 'readShard')
@@ -156,6 +192,7 @@ describe('KinesisReadable', () => {
     })
 
     it('emits error when there is an error', () => {
+      expect(1)
       client.describeStream = AWSPromise.rejects('lol error')
       const reader = new main.KinesisReadable(client, 'stream name', {foo: 'bar'})
 
@@ -180,6 +217,7 @@ describe('KinesisReadable', () => {
 
   describe('readShard', () => {
     it('exits when there is an error preserving iterator', () => {
+      expect(1)
       client.getRecords = sinon.stub().returns({promise: () => Promise.reject(new Error('mock error'))})
       const reader = new main.KinesisReadable(client, 'stream name', {foo: 'bar'})
 
@@ -194,6 +232,7 @@ describe('KinesisReadable', () => {
     })
 
     it('exits when shard is closed', () => {
+      expect(1)
       client.getRecords = sinon.stub().returns({promise: () => Promise.resolve({Records: []})})
       const reader = new main.KinesisReadable(client, 'stream name', {foo: 'bar'})
 
@@ -209,6 +248,7 @@ describe('KinesisReadable', () => {
     })
 
     it('continues to read open shard', () => {
+      expect(2)
       const record = {
         Data: '',
         SequenceNumber: 'seq-1',
@@ -234,6 +274,7 @@ describe('KinesisReadable', () => {
     })
 
     it('parses incoming records', () => {
+      expect(3)
       const record = {
         Data: '{"foo":"bar"}',
         SequenceNumber: 'seq-1',
@@ -257,6 +298,7 @@ describe('KinesisReadable', () => {
     })
 
     it('parser exceptions are passed through', () => {
+      expect(1)
       const record = {
         Data: '{"foo":"bar"}',
         SequenceNumber: 'seq-1',
@@ -278,6 +320,7 @@ describe('KinesisReadable', () => {
 
   describe('_read', () => {
     it('only calls _startKinesis once', () => {
+      expect(1)
       const reader = new main.KinesisReadable(client, 'stream name', {foo: 'bar'})
       sandbox.stub(reader, '_startKinesis').returns(Promise.resolve())
 
