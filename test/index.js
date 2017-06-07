@@ -1,7 +1,6 @@
+// Convenience wrapper around Promise to reduce test boilerplate
 const sinon = require('sinon')
 
-
-// Convenience wrapper around Promise to reduce test boilerplate
 const AWSPromise = {
   resolves: (value) => {
     return sinon.stub().returns({
