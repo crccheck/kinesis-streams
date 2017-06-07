@@ -207,17 +207,15 @@ describe('KinesisReadable', () => {
     })
 
     it('continues to read open shard', () => {
-      const clock = sandbox.useFakeTimers()
-      const getNextIterator = sinon.stub()
       const record = {
         Data: '',
         SequenceNumber: 'seq-1',
       }
-      getNextIterator.onFirstCall().returns('shard-iterator-4')
-      getNextIterator.onSecondCall().returns(undefined)
-      client.getRecords = (params, cb) =>
-        cb(null, {Records: [record], NextShardIterator: getNextIterator()})
-      const reader = new main.KinesisReadable(client, 'stream name', {foo: 'bar'})
+      const getRecords = sinon.stub()
+      getRecords.onCall(0).returns({promise: () => Promise.resolve({Records: [record], NextShardIterator: 'shard-iterator-4'})})
+      getRecords.onCall(1).returns({promise: () => Promise.resolve({Records: []})})
+      client.getRecords = getRecords
+      const reader = new main.KinesisReadable(client, 'stream name', {interval: 0})
 
       reader.once('error', () => {
         assert.ok(false, 'this should never run')
@@ -226,11 +224,11 @@ describe('KinesisReadable', () => {
         assert.equal(seq, 'seq-1')
       })
 
-      reader.readShard('shard-iterator-3')
-
-      assert.strictEqual(getNextIterator.callCount, 1)
-      clock.tick(10000)  // A number bigger than the idle time
-      assert.strictEqual(getNextIterator.callCount, 2)
+      return reader.readShard('shard-iterator-3')
+        .then(() => {
+          assert.strictEqual(getRecords.callCount, 2)
+          console.log('waited', getRecords.callCount)
+        })
     })
 
     it('parses incoming records', () => {
