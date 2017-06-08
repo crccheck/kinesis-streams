@@ -12,7 +12,8 @@ function expect (n/*: number */) {
   _expected = n
 }
 
-const methods = ['ok', 'equal', 'deepEqual', 'strictEqual']
+// Object.keys(assert)
+const methods = ['deepEqual', 'deepStrictEqual', 'doesNotThrow', 'equal', 'fail', 'ifError', 'notDeepEqual', 'notDeepStrictEqual', 'notEqual', 'notStrictEqual', 'ok', 'strictEqual', 'throws']
 
 beforeEach(function () {
   methods.forEach((x) => assert[x].restore && assert[x].restore())  // needed when running --watch
