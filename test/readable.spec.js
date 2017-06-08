@@ -12,7 +12,8 @@ function expect (n/*: number */) {
   _expected = n
 }
 
-const methods = ['ok', 'equal', 'deepEqual', 'strictEqual']
+// Object.keys(assert)
+const methods = ['deepEqual', 'deepStrictEqual', 'doesNotThrow', 'equal', 'fail', 'ifError', 'notDeepEqual', 'notDeepStrictEqual', 'notEqual', 'notStrictEqual', 'ok', 'strictEqual', 'throws']
 
 beforeEach(function () {
   methods.forEach((x) => assert[x].restore && assert[x].restore())  // needed when running --watch
@@ -36,7 +37,7 @@ describe('KinesisReadable', () => {
   let sandbox
 
   beforeEach(() => {
-    client = {}
+    client = {constructor: {__super__: {serviceIdentifier: 'kinesis'}}}
     sandbox = sinon.sandbox.create()
   })
 
@@ -270,6 +271,35 @@ describe('KinesisReadable', () => {
         .then(() => {
           assert.strictEqual(getRecords.callCount, 2)
           console.log('waited', getRecords.callCount)
+        })
+    })
+
+    it('retries read failures', () => {
+      expect(2)
+      const record = {
+        Data: '',
+        SequenceNumber: 'seq-1',
+      }
+      const getRecords = sinon.stub()
+      const awsError = new Error()
+      // $FlowFixMe
+      awsError.retryable = true
+      getRecords.onCall(0).returns({promise: () => Promise.reject(awsError)})
+      getRecords.onCall(1).returns({promise: () => Promise.resolve({Records: [record], NextShardIterator: 'shard-iterator-4'})})
+      getRecords.onCall(2).returns({promise: () => Promise.resolve({Records: []})})
+      client.getRecords = getRecords
+      const reader = new main.KinesisReadable(client, 'stream name', {interval: 0})
+
+      reader.once('error', (err) => {
+        assert.ok(false, err)
+      })
+      reader.once('checkpoint', (seq) => {
+        assert.equal(seq, 'seq-1')
+      })
+
+      return reader.readShard('shard-iterator-3')
+        .then(() => {
+          assert.strictEqual(getRecords.callCount, 3)
         })
     })
 
