@@ -168,8 +168,11 @@ describe('KinesisWritable', function () {
       })
     })
 
-    it('should emit error on Kinesis error', function (done) {
-      client.putRecords = AWSPromise.rejects('Fail')
+    it('should emit error on unretryable Kinesis error', function (done) {
+      const unretryableError = new Error('Fail')
+      // $FlowFixMe you can do whatever you want to Error
+      unretryableError.retryable = false
+      client.putRecords = AWSPromise.rejects(unretryableError)
 
       stream.on('error', (err) => {
         assert.strictEqual(err.message, 'Fail')
