@@ -16,7 +16,7 @@ function expect (n/*: number */) {
 const methods = ['deepEqual', 'deepStrictEqual', 'doesNotThrow', 'equal', 'fail', 'ifError', 'notDeepEqual', 'notDeepStrictEqual', 'notEqual', 'notStrictEqual', 'ok', 'strictEqual', 'throws']
 
 beforeEach(function () {
-  methods.forEach((x) => assert[x].restore && assert[x].restore())  // needed when running --watch
+  methods.forEach((x) => assert[x].restore && assert[x].restore()) // needed when running --watch
   methods.forEach((x) => sinon.spy(assert, x))
   this.actual = 0
   _expected = 0
