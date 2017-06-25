@@ -204,6 +204,27 @@ describe('KinesisWritable', function () {
       streamArray(recordsFixture).pipe(stream)
     })
 
+    it('should retry generic errors requests', function (done) {
+      sandbox.stub(stream, 'getPartitionKey').returns('1234')
+
+      const genericError = new Error('Fail')
+      client.putRecords = AWSPromise.rejects(genericError)
+      client.putRecords.onCall(2).returns({promise: () => Promise.resolve(successResponseFixture)})
+
+      stream.on('finish', () => {
+        assert.equal(client.putRecords.callCount, 3)
+
+        expect(client.putRecords.secondCall).to.have.been.calledWith({
+          Records: writeFixture,
+          StreamName: 'streamName',
+        })
+
+        done()
+      })
+
+      streamArray(recordsFixture).pipe(stream)
+    })
+
     it('should retry failed records', function (done) {
       let putRecordsCount = 0
       sandbox.stub(stream, 'getPartitionKey').returns('1234')
