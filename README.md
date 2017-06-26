@@ -9,10 +9,10 @@ There once was a [Kinesis readable stream][kinesis-console-consumer] without a
 home, and a Kinesis writable stream without a home, so now they're roommates.
 
 
-Usage
------
+Installing
+----------
 
-    npm install [-g] kinesis-streams
+    npm install kinesis-streams
 
 
 Writeable stream
