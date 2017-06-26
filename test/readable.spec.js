@@ -1,6 +1,7 @@
 // @flow weak
 /* eslint-disable no-new */
 const assert = require('assert')
+const errcode = require('err-code')
 const sinon = require('sinon')
 
 const { AWSPromise } = require('./')
@@ -57,13 +58,13 @@ describe('KinesisReadable', () => {
 
     it('handles errors', () => {
       expect(1)
-      client.listStreams = AWSPromise.rejects('lol error')
+      client.listStreams = AWSPromise.rejects(new Error('lol error'))
       return main.getStreams(client)
         .then((data) => {
           assert.strictEqual(true, false)
         })
         .catch((err) => {
-          assert.strictEqual(err, 'lol error')
+          assert.strictEqual(err.message, 'lol error')
         })
     })
   })
@@ -129,7 +130,7 @@ describe('KinesisReadable', () => {
 
     it('handles errors', () => {
       expect(1)
-      client.describeStream = AWSPromise.rejects('lol error')
+      client.describeStream = AWSPromise.rejects(new Error('lol error'))
       const reader = new main.KinesisReadable(client, 'stream-name')
 
       return reader.getShardId()
@@ -137,7 +138,7 @@ describe('KinesisReadable', () => {
           assert.ok(false)
         })
         .catch((err) => {
-          assert.strictEqual(err, 'lol error')
+          assert.strictEqual(err.message, 'lol error')
         })
     })
   })
@@ -157,14 +158,14 @@ describe('KinesisReadable', () => {
     it('handles errors', () => {
       expect(1)
       const reader = new main.KinesisReadable(client, 'stream-name')
-      client.getShardIterator = AWSPromise.rejects('lol error')
+      client.getShardIterator = AWSPromise.rejects(new Error('lol error'))
 
       return reader.getShardIterator('shard-id')
         .then((data) => {
           assert.ok(false)
         })
         .catch((err) => {
-          assert.strictEqual(err, 'lol error')
+          assert.strictEqual(err.message, 'lol error')
         })
     })
   })
@@ -194,11 +195,11 @@ describe('KinesisReadable', () => {
 
     it('emits error when there is an error', () => {
       expect(1)
-      client.describeStream = AWSPromise.rejects('lol error')
+      client.describeStream = AWSPromise.rejects(new Error('lol error'))
       const reader = new main.KinesisReadable(client, 'stream name', {foo: 'bar'})
 
       reader.once('error', (err) => {
-        assert.equal(err, 'lol error')
+        assert.equal(err.message, 'lol error')
       })
 
       return reader._startKinesis('stream name', {})
@@ -206,12 +207,12 @@ describe('KinesisReadable', () => {
 
     // $FlowFixMe
     xit('logs when there is an error', () => {
-      client.describeStream = AWSPromise.rejects('lol error')
+      client.describeStream = AWSPromise.rejects(new Error('lol error'))
       const reader = new main.KinesisReadable(client, 'stream name', {foo: 'bar'})
 
       return reader._startKinesis('stream name', {})
         .then(() => {
-          assert.equal(console.log.args[0][0], 'lol error')
+          assert.equal(console.log.args[0][0].message, 'lol error')
         })
     })
   })
@@ -219,7 +220,8 @@ describe('KinesisReadable', () => {
   describe('readShard', () => {
     it('exits when there is an error preserving iterator', () => {
       expect(1)
-      client.getRecords = sinon.stub().returns({promise: () => Promise.reject(new Error('mock error'))})
+      const err = errcode(new Error('mock error'), {retryable: false})
+      client.getRecords = sinon.stub().returns({promise: () => Promise.reject(err)})
       const reader = new main.KinesisReadable(client, 'stream name', {foo: 'bar'})
 
       reader.once('error', (err) => {
@@ -281,9 +283,7 @@ describe('KinesisReadable', () => {
         SequenceNumber: 'seq-1',
       }
       const getRecords = sinon.stub()
-      const awsError = new Error()
-      // $FlowFixMe
-      awsError.retryable = true
+      const awsError = errcode(new Error(), {retryable: true})
       getRecords.onCall(0).returns({promise: () => Promise.reject(awsError)})
       getRecords.onCall(1).returns({promise: () => Promise.resolve({Records: [record], NextShardIterator: 'shard-iterator-4'})})
       getRecords.onCall(2).returns({promise: () => Promise.resolve({Records: []})})
