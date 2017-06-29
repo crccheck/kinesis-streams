@@ -1,6 +1,8 @@
 Kinesis Streams
 ===============
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/crccheck/kinesis-streams.svg)](https://greenkeeper.io/)
+
 [![Build Status](https://travis-ci.org/crccheck/kinesis-streams.svg?branch=master)](https://travis-ci.org/crccheck/kinesis-streams)
 [![npm version](https://badge.fury.io/js/kinesis-streams.svg)](https://badge.fury.io/js/kinesis-streams)
 [![Test Coverage](https://codeclimate.com/github/crccheck/kinesis-streams/badges/coverage.svg)](https://codeclimate.com/github/crccheck/kinesis-streams/coverage)
