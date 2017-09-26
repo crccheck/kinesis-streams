@@ -44,7 +44,7 @@
     "istanbul": "^0.4.5",
     "lodash": "^4.17.4",
     "mocha": "^3.5.0",
-    "sinon": "^3.0.0",
+    "sinon": "^4.0.0",
     "sinon-chai": "^2.13.0",
     "stream-array": "^1.1.2"
   },
