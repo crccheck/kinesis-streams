@@ -20,7 +20,11 @@
     "kinesis",
     "stream",
     "readable",
-    "writable"
+    "writable",
+    "kcl",
+    "kpl",
+    "consumer",
+    "producer"
   ],
   "author": "Chris Chang <c@crccheck.com> (http://crccheck.com/blog)",
   "license": "Apache-2.0",
