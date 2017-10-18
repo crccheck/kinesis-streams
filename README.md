@@ -87,6 +87,11 @@ The writable stream is based on the interface of [kinesis-write-stream]. The
 readable stream was originally written as a proof of concept in
 [kinesis-console-consumer].
 
+[kinesis-write-stream] was forked because at the time, it didn't support
+periodic flushes. Since then the configuration of the readable and writable
+streams have been rewritten to be consistent, and both emit lots of events now
+that consumers can use for instrumentation.
+
 
 License
 -------
