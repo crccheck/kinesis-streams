@@ -28,10 +28,12 @@ Writeable stream
 ### Options
 
 * `options.logger` ([optional](#loggers)) [bunyan], [winston], or logger with `debug`, `error` and `info`
-* `options.highWaterMark` (default: 16) Buffer this many records before writing to Kinesis
+* `options.highWaterMark` (default: 16) Buffer this many records before writing to Kinesis. Equivalent to `CollectionMaxCount`
 * `options.maxRetries` (default: 3) How many times to attempt a failed Kinesis put
 * `options.retryTimeout` (default: 100) The initial retry delay in milliseconds
-* `options.wait` (default: 500) How many milliseconds it should periodically flush
+* `options.wait` (default: 500) How many milliseconds it should periodically flush. Equivalent to `RecordMaxBufferedTime`
+
+Some of these options have equivalents in the official [KPL].
 
 ### Custom events
 
@@ -108,4 +110,5 @@ This package is licensed under Apache License 2.0, but the
 [kinesis-console-consumer]: https://github.com/crccheck/kinesis-console-consumer
 [kinesis-readable]: https://github.com/rclark/kinesis-readable
 [kinesis-write-stream]: https://github.com/voldern/kinesis-write-stream
+[KPL]: https://docs.aws.amazon.com/streams/latest/dev/developing-producers-with-kpl.html
 [winston]: https://github.com/winstonjs/winston
