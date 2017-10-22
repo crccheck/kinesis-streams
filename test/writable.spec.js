@@ -68,7 +68,7 @@ describe('KinesisWritable', function () {
 
     it('should correct highWaterMark above 500', function () {
       const stream = new KinesisWritable({}, 'test', { highWaterMark: 501 })
-      expect(stream.highWaterMark).to.equal(500)
+      expect(stream.collectionMaxCount).to.equal(500)
     })
   })
 
