@@ -6,7 +6,6 @@ const errcode = require('err-code')
 const sinon = require('sinon')
 const sinonChai = require('sinon-chai')
 const streamArray = require('stream-array')
-const _ = require('lodash')
 
 const AWSPromise = require('./').AWSPromise
 const recordsFixture = require('./fixture/records')
@@ -73,19 +72,6 @@ describe('KinesisWritable', function () {
   })
 
   describe('getPartitionKey', function () {
-    // $FlowFixMe
-    xit('should return a random partition key padded to 4 digits', function () {
-      var kinesis = new KinesisWritable({}, 'foo')
-
-      sandbox.stub(_, 'random').returns(10)
-
-      assert.equal(kinesis.getPartitionKey(), '0010')
-
-      _.random.returns(1000)
-
-      assert.equal(kinesis.getPartitionKey(), '0010')
-    })
-
     it('should be called with the current record being added', function (done) {
       client.putRecords = AWSPromise.resolves(successResponseFixture)
       sandbox.stub(stream, 'getPartitionKey').returns('1234')
@@ -116,14 +102,14 @@ describe('KinesisWritable', function () {
     })
   })
 
-  describe('getQueueSpliceIdx', function () {
+  describe('getQueueSpliceCount', function () {
     it('limits small records to collectionMaxCount', () => {
       const stream = new KinesisWritable(client, 'streamName', {
         highWaterMark: 5,
       })
       const record = {Data: ''}
       stream.queue = [record, record, record, record, record, record]
-      assert.equal(stream.getQueueSpliceIdx(), 5)
+      assert.equal(stream.getQueueSpliceCount(), 5)
     })
 
     it('limits big records to collectionMaxSize', () => {
@@ -133,7 +119,7 @@ describe('KinesisWritable', function () {
       const record = {Data: ' '}
       stream.queue = [record, record, record, record, record, record]
       stream.collectionMaxSize = 5
-      assert.equal(stream.getQueueSpliceIdx(), 5)
+      assert.equal(stream.getQueueSpliceCount(), 5)
     })
   })
 
