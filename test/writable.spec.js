@@ -116,6 +116,11 @@ describe('KinesisWritable', function () {
     })
   })
 
+  describe('getQueueSpliceIdx', function () {
+    it('limits small records to collectionMaxCount')
+    it('limits big records to collectionMaxSize')
+  })
+
   describe('_write', function () {
     it('should write to Kinesis when stream is closed', function (done) {
       client.putRecords = AWSPromise.resolves(successResponseFixture)
