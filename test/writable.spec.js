@@ -121,11 +121,20 @@ describe('KinesisWritable', function () {
       const stream = new KinesisWritable(client, 'streamName', {
         highWaterMark: 5,
       })
-      stream.queue = [{}, {}, {}, {}, {}, {}]
+      const record = {Data: ''}
+      stream.queue = [record, record, record, record, record, record]
       assert.equal(stream.getQueueSpliceIdx(), 5)
     })
 
-    it('limits big records to collectionMaxSize')
+    it('limits big records to collectionMaxSize', () => {
+      const stream = new KinesisWritable(client, 'streamName', {
+        highWaterMark: 500,
+      })
+      const record = {Data: ' '}
+      stream.queue = [record, record, record, record, record, record]
+      stream.collectionMaxSize = 5
+      assert.equal(stream.getQueueSpliceIdx(), 5)
+    })
   })
 
   describe('_write', function () {
