@@ -117,7 +117,14 @@ describe('KinesisWritable', function () {
   })
 
   describe('getQueueSpliceIdx', function () {
-    it('limits small records to collectionMaxCount')
+    it('limits small records to collectionMaxCount', () => {
+      const stream = new KinesisWritable(client, 'streamName', {
+        highWaterMark: 5,
+      })
+      stream.queue = [{}, {}, {}, {}, {}, {}]
+      assert.equal(stream.getQueueSpliceIdx(), 5)
+    })
+
     it('limits big records to collectionMaxSize')
   })
 
