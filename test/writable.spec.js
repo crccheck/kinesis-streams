@@ -6,7 +6,6 @@ const errcode = require('err-code')
 const sinon = require('sinon')
 const sinonChai = require('sinon-chai')
 const streamArray = require('stream-array')
-const _ = require('lodash')
 
 const AWSPromise = require('./').AWSPromise
 const recordsFixture = require('./fixture/records')
@@ -68,24 +67,11 @@ describe('KinesisWritable', function () {
 
     it('should correct highWaterMark above 500', function () {
       const stream = new KinesisWritable({}, 'test', { highWaterMark: 501 })
-      expect(stream.highWaterMark).to.equal(500)
+      expect(stream.collectionMaxCount).to.equal(500)
     })
   })
 
   describe('getPartitionKey', function () {
-    // $FlowFixMe
-    xit('should return a random partition key padded to 4 digits', function () {
-      var kinesis = new KinesisWritable({}, 'foo')
-
-      sandbox.stub(_, 'random').returns(10)
-
-      assert.equal(kinesis.getPartitionKey(), '0010')
-
-      _.random.returns(1000)
-
-      assert.equal(kinesis.getPartitionKey(), '0010')
-    })
-
     it('should be called with the current record being added', function (done) {
       client.putRecords = AWSPromise.resolves(successResponseFixture)
       sandbox.stub(stream, 'getPartitionKey').returns('1234')
@@ -113,6 +99,27 @@ describe('KinesisWritable', function () {
       })
 
       streamArray(recordsFixture).pipe(stream)
+    })
+  })
+
+  describe('getQueueSpliceCount', function () {
+    it('limits small records to collectionMaxCount', () => {
+      const stream = new KinesisWritable(client, 'streamName', {
+        highWaterMark: 5,
+      })
+      const record = {Data: ''}
+      stream.queue = [record, record, record, record, record, record]
+      assert.equal(stream.getQueueSpliceCount(), 5)
+    })
+
+    it('limits big records to collectionMaxSize', () => {
+      const stream = new KinesisWritable(client, 'streamName', {
+        highWaterMark: 500,
+      })
+      const record = {Data: ' '}
+      stream.queue = [record, record, record, record, record, record]
+      stream.collectionMaxSize = 5
+      assert.equal(stream.getQueueSpliceCount(), 5)
     })
   })
 
