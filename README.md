@@ -43,6 +43,25 @@ These events are emitted:
 
         reader.on('kinesis.putRecords', (response: {FailedRecordCount: number, Records: Record[]}) => {})
 
+### Setting the partition key
+
+By default, the partition key is to a dummy value, `'0'`. If you have multiple
+shards, you need to set a partition key in a way that makes sense for your
+data. Here are two ways to do this:
+
+1. Set the `getPartitionKey` method of the writable stream instance:
+
+  ```
+  const AWS = require('aws-sdk')
+  const { KinesisWritable } = require('kinesis-streams')
+  const client = new AWS.Kinesis()
+  const writable = new KinesisWritable(client, 'streamName', options)
+  writable.getPartitionKey = (data) => data.foo.substr(5)
+  inputStream.pipe(writable)
+  ```
+
+2. Subclass `KinesisWritable` and provide your own `getPartitionKey`. See the [source](https://github.com/crccheck/kinesis-streams/blob/master/lib/writable.js) for reference.
+
 
 Readable stream
 ---------------
