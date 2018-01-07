@@ -45,9 +45,9 @@ These events are emitted:
 
 ### Setting the partition key
 
-By default, the partition key is to a dummy value, `'0'`. If you have multiple
-shards, you need to set a partition key in a way that makes sense for your
-data. Here are two ways to do this:
+By default, the [partition key] is to a dummy value, `'0'`. If you have
+multiple shards, you need to set a [partition key] in a way that makes sense
+for your data. Here are two ways to do this:
 
 1. Set the `getPartitionKey` method of the writable stream instance:
 
@@ -130,4 +130,5 @@ This package is licensed under Apache License 2.0, but the
 [kinesis-readable]: https://github.com/rclark/kinesis-readable
 [kinesis-write-stream]: https://github.com/voldern/kinesis-write-stream
 [KPL]: https://docs.aws.amazon.com/streams/latest/dev/developing-producers-with-kpl.html
+[partition key]: https://docs.aws.amazon.com/streams/latest/dev/key-concepts.html#partition-key
 [winston]: https://github.com/winstonjs/winston
