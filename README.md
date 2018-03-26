@@ -21,6 +21,7 @@ Writeable stream
     const AWS = require('aws-sdk')
     const { KinesisWritable } = require('kinesis-streams')
     const client = new AWS.Kinesis()
+    client.config.update({ maxRetries: 10 })
     const writable = new KinesisWritable(client, 'streamName', options)
     inputStream.pipe(writable)
 
