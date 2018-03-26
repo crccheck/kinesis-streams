@@ -1,7 +1,6 @@
 // @flow weak
 /* eslint-disable no-new */
 const assert = require('assert')
-const errcode = require('err-code')
 const sinon = require('sinon')
 
 const { AWSPromise } = require('./')
