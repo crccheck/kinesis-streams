@@ -1,7 +1,6 @@
 // @flow weak
 /* eslint-disable no-new */
 const assert = require('assert')
-const errcode = require('err-code')
 const sinon = require('sinon')
 
 const { AWSPromise } = require('./')
@@ -218,31 +217,14 @@ describe('KinesisReadable', () => {
   })
 
   describe('readShard', () => {
-    it('exits when there is an error preserving iterator', () => {
-      expect(1)
-      const err = errcode(new Error('mock error'), {retryable: false})
-      client.getRecords = sinon.stub().returns({promise: () => Promise.reject(err)})
-      const reader = new main.KinesisReadable(client, 'stream name', {foo: 'bar'})
-
-      reader.once('error', (err) => {
-        assert.equal(err.message, 'mock error')
-      })
-
-      return reader.readShard('shard-iterator-1')
-        .then(() => {
-          assert(reader.iterators.has('shard-iterator-1'))
-        })
-    })
-
     it('exits when shard is closed', () => {
       expect(1)
-      client.getRecords = sinon.stub().returns({promise: () => Promise.resolve({Records: []})})
+      client.getRecords = AWSPromise.resolves({Records: []})
       const reader = new main.KinesisReadable(client, 'stream name', {foo: 'bar'})
 
       reader.once('error', () => {
         assert.ok(false, 'this should never run')
       })
-
 
       return reader.readShard('shard-iterator-2')
         .then(() => {
@@ -273,33 +255,6 @@ describe('KinesisReadable', () => {
         .then(() => {
           assert.strictEqual(getRecords.callCount, 2)
           console.log('waited', getRecords.callCount)
-        })
-    })
-
-    it('retries read failures', () => {
-      expect(2)
-      const record = {
-        Data: '',
-        SequenceNumber: 'seq-1',
-      }
-      const getRecords = sinon.stub()
-      const awsError = errcode(new Error(), {retryable: true})
-      getRecords.onCall(0).returns({promise: () => Promise.reject(awsError)})
-      getRecords.onCall(1).returns({promise: () => Promise.resolve({Records: [record], NextShardIterator: 'shard-iterator-4'})})
-      getRecords.onCall(2).returns({promise: () => Promise.resolve({Records: []})})
-      client.getRecords = getRecords
-      const reader = new main.KinesisReadable(client, 'stream name', {interval: 0})
-
-      reader.once('error', (err) => {
-        assert.ok(false, err)
-      })
-      reader.once('checkpoint', (seq) => {
-        assert.equal(seq, 'seq-1')
-      })
-
-      return reader.readShard('shard-iterator-3')
-        .then(() => {
-          assert.strictEqual(getRecords.callCount, 3)
         })
     })
 

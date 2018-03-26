@@ -21,6 +21,7 @@ Writeable stream
     const AWS = require('aws-sdk')
     const { KinesisWritable } = require('kinesis-streams')
     const client = new AWS.Kinesis()
+    client.config.update({ maxRetries: 10 })
     const writable = new KinesisWritable(client, 'streamName', options)
     inputStream.pipe(writable)
 
@@ -28,8 +29,6 @@ Writeable stream
 
 * `options.logger` ([optional](#loggers)) [bunyan], [winston], or logger with `debug`, `error` and `info`
 * `options.highWaterMark` (default: 16) Buffer this many records before writing to Kinesis. Equivalent to `CollectionMaxCount`
-* `options.maxRetries` (default: 3) How many times to attempt a failed Kinesis put
-* `options.retryTimeout` (default: 100) The initial retry delay in milliseconds
 * `options.wait` (default: 500) How many milliseconds it should periodically flush. Equivalent to `RecordMaxBufferedTime`
 
 Some of these options have equivalents in the official [KPL].

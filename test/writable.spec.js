@@ -2,7 +2,6 @@
 /* eslint-disable no-new,no-unused-expressions */
 const assert = require('assert')
 const chai = require('chai')
-const errcode = require('err-code')
 const sinon = require('sinon')
 const sinonChai = require('sinon-chai')
 const streamArray = require('stream-array')
@@ -174,62 +173,6 @@ describe('KinesisWritable', function () {
           done()
         })
       })
-    })
-
-    it('should emit error on unretryable Kinesis error', function (done) {
-      const unretryableError = errcode(new Error('Fail'), {retryable: false})
-      client.putRecords = AWSPromise.rejects(unretryableError)
-
-      stream.on('error', (err) => {
-        assert.strictEqual(err.message, 'Fail')
-        assert.strictEqual(stream.queue.length, 1)
-
-        done()
-      })
-
-      stream.end({ foo: 'bar' })
-    })
-
-    it('should retry failed putRecords requests', function (done) {
-      sandbox.stub(stream, 'getPartitionKey').returns('1234')
-
-      const retryableError = errcode(new Error('Fail'), {retryable: true})
-      client.putRecords = AWSPromise.rejects(retryableError)
-      client.putRecords.onCall(2).returns({promise: () => Promise.resolve(successResponseFixture)})
-
-      stream.on('finish', () => {
-        assert.equal(client.putRecords.callCount, 3)
-
-        expect(client.putRecords.secondCall).to.have.been.calledWith({
-          Records: writeFixture,
-          StreamName: 'streamName',
-        })
-
-        done()
-      })
-
-      streamArray(recordsFixture).pipe(stream)
-    })
-
-    it('should retry generic errors requests', function (done) {
-      sandbox.stub(stream, 'getPartitionKey').returns('1234')
-
-      const genericError = new Error('Fail')
-      client.putRecords = AWSPromise.rejects(genericError)
-      client.putRecords.onCall(2).returns({promise: () => Promise.resolve(successResponseFixture)})
-
-      stream.on('finish', () => {
-        assert.equal(client.putRecords.callCount, 3)
-
-        expect(client.putRecords.secondCall).to.have.been.calledWith({
-          Records: writeFixture,
-          StreamName: 'streamName',
-        })
-
-        done()
-      })
-
-      streamArray(recordsFixture).pipe(stream)
     })
 
     it('should retry failed records', function (done) {
