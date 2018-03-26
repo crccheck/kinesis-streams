@@ -218,22 +218,6 @@ describe('KinesisReadable', () => {
   })
 
   describe('readShard', () => {
-    it('exits when there is an error preserving iterator', () => {
-      expect(1)
-      const err = errcode(new Error('mock error'), {retryable: false})
-      client.getRecords = sinon.stub().returns({promise: () => Promise.reject(err)})
-      const reader = new main.KinesisReadable(client, 'stream name', {foo: 'bar'})
-
-      reader.once('error', (err) => {
-        assert.equal(err.message, 'mock error')
-      })
-
-      return reader.readShard('shard-iterator-1')
-        .then(() => {
-          assert(reader.iterators.has('shard-iterator-1'))
-        })
-    })
-
     it('exits when shard is closed', () => {
       expect(1)
       client.getRecords = sinon.stub().returns({promise: () => Promise.resolve({Records: []})})
@@ -242,7 +226,6 @@ describe('KinesisReadable', () => {
       reader.once('error', () => {
         assert.ok(false, 'this should never run')
       })
-
 
       return reader.readShard('shard-iterator-2')
         .then(() => {
