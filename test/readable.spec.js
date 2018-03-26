@@ -259,33 +259,6 @@ describe('KinesisReadable', () => {
         })
     })
 
-    it('retries read failures', () => {
-      expect(2)
-      const record = {
-        Data: '',
-        SequenceNumber: 'seq-1',
-      }
-      const getRecords = sinon.stub()
-      const awsError = errcode(new Error(), {retryable: true})
-      getRecords.onCall(0).returns({promise: () => Promise.reject(awsError)})
-      getRecords.onCall(1).returns({promise: () => Promise.resolve({Records: [record], NextShardIterator: 'shard-iterator-4'})})
-      getRecords.onCall(2).returns({promise: () => Promise.resolve({Records: []})})
-      client.getRecords = getRecords
-      const reader = new main.KinesisReadable(client, 'stream name', {interval: 0})
-
-      reader.once('error', (err) => {
-        assert.ok(false, err)
-      })
-      reader.once('checkpoint', (seq) => {
-        assert.equal(seq, 'seq-1')
-      })
-
-      return reader.readShard('shard-iterator-3')
-        .then(() => {
-          assert.strictEqual(getRecords.callCount, 3)
-        })
-    })
-
     it('parses incoming records', () => {
       expect(3)
       const record = {
