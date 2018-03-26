@@ -220,7 +220,7 @@ describe('KinesisReadable', () => {
   describe('readShard', () => {
     it('exits when shard is closed', () => {
       expect(1)
-      client.getRecords = sinon.stub().returns({promise: () => Promise.resolve({Records: []})})
+      client.getRecords = AWSPromise.resolves({Records: []})
       const reader = new main.KinesisReadable(client, 'stream name', {foo: 'bar'})
 
       reader.once('error', () => {
