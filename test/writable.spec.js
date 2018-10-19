@@ -21,12 +21,9 @@ const expect = chai.expect
 
 describe('KinesisWritable', function () {
   let client
-  let sandbox
   let stream
 
   beforeEach(function () {
-    sandbox = sinon.sandbox.create()
-
     client = {
       putRecords: sinon.stub(),
       constructor: {
@@ -42,7 +39,7 @@ describe('KinesisWritable', function () {
   })
 
   afterEach(function () {
-    sandbox.restore()
+    sinon.restore()
   })
 
   describe('constructor', function () {
@@ -73,7 +70,7 @@ describe('KinesisWritable', function () {
   describe('getPartitionKey', function () {
     it('should be called with the current record being added', function (done) {
       client.putRecords = AWSPromise.resolves(successResponseFixture)
-      sandbox.stub(stream, 'getPartitionKey').returns('1234')
+      sinon.stub(stream, 'getPartitionKey').returns('1234')
 
       stream.on('finish', () => {
         expect(stream.getPartitionKey).to.have.been.calledWith(recordsFixture[0])
@@ -90,7 +87,7 @@ describe('KinesisWritable', function () {
         return 'custom-partition'
       }
 
-      sandbox.spy(stream, 'getPartitionKey')
+      sinon.spy(stream, 'getPartitionKey')
 
       stream.on('finish', () => {
         assert.strictEqual(stream.getPartitionKey(), 'custom-partition')
@@ -125,7 +122,7 @@ describe('KinesisWritable', function () {
   describe('_write', function () {
     it('should write to Kinesis when stream is closed', function (done) {
       client.putRecords = AWSPromise.resolves(successResponseFixture)
-      sandbox.stub(stream, 'getPartitionKey').returns('1234')
+      sinon.stub(stream, 'getPartitionKey').returns('1234')
 
       stream.on('finish', () => {
         expect(client.putRecords).to.have.been.calledOnce
@@ -177,7 +174,7 @@ describe('KinesisWritable', function () {
 
     it('should retry failed records', function (done) {
       let putRecordsCount = 0
-      sandbox.stub(stream, 'getPartitionKey').returns('1234')
+      sinon.stub(stream, 'getPartitionKey').returns('1234')
 
       client.putRecords = AWSPromise.resolves(failedResponseFixture)
       client.putRecords.onCall(1).returns({ promise: () => Promise.resolve(successAfterFailedResponseFixture) })

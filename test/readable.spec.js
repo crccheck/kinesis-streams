@@ -29,20 +29,14 @@ afterEach(function () {
     // eslint-disable-next-line no-mixed-operators
     assert.strictEqual(actual, _expected, `Expected ${_expected} assertion${_expected !== 1 && 's' || ''}, but saw ${actual}`)
   }
-  methods.forEach((x) => assert[x].restore())
+  sinon.restore()
 })
 
 describe('KinesisReadable', () => {
   let client
-  let sandbox
 
   beforeEach(() => {
     client = { constructor: { __super__: { serviceIdentifier: 'kinesis' } } }
-    sandbox = sinon.sandbox.create()
-  })
-
-  afterEach(() => {
-    sandbox.restore()
   })
 
   describe('getStreams', () => {
@@ -171,7 +165,7 @@ describe('KinesisReadable', () => {
       expect(4)
       client.describeStream = AWSPromise.resolves({ StreamDescription: { Shards: [{ ShardId: 'shard id' }] } })
       client.getShardIterator = AWSPromise.resolves({ ShardIterator: 'shard iterator' })
-      sandbox.stub(main.KinesisReadable.prototype, 'readShard')
+      sinon.stub(main.KinesisReadable.prototype, 'readShard')
       const options = {
         foo: 'bar',
         ShardIteratorType: 'SHIT',
@@ -292,7 +286,7 @@ describe('KinesisReadable', () => {
     it('only calls _startKinesis once', () => {
       expect(1)
       const reader = new main.KinesisReadable(client, 'stream name', { foo: 'bar' })
-      sandbox.stub(reader, '_startKinesis').returns(Promise.resolve())
+      sinon.stub(reader, '_startKinesis').returns(Promise.resolve())
 
       reader._read()
       reader._read()
