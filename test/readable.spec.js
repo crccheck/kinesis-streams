@@ -217,7 +217,7 @@ describe('KinesisReadable', () => {
   })
 
   describe('readShard', () => {
-    it('exits when shard is closed', () => {
+    it('exits when shard is closed', async () => {
       expect(1)
       client.getRecords = AWSPromise.resolves({Records: []})
       const reader = new main.KinesisReadable(client, 'stream name', {foo: 'bar'})
@@ -226,13 +226,11 @@ describe('KinesisReadable', () => {
         assert.ok(false, 'this should never run')
       })
 
-      return reader.readShard('shard-iterator-2')
-        .then(() => {
-          assert.equal(reader.iterators.size, 0)
-        })
+      await reader.readShard('shard-iterator-2')
+      assert.equal(reader.iterators.size, 0)
     })
 
-    it('continues to read open shard', () => {
+    it('continues to read open shard', async () => {
       expect(2)
       const record = {
         Data: '',
@@ -245,20 +243,17 @@ describe('KinesisReadable', () => {
       const reader = new main.KinesisReadable(client, 'stream name', {interval: 0})
 
       reader.once('error', () => {
-        assert.ok(false, 'this should never run')
+        assert(0)
       })
       reader.once('checkpoint', (seq) => {
         assert.equal(seq, 'seq-1')
       })
 
-      return reader.readShard('shard-iterator-3')
-        .then(() => {
-          assert.strictEqual(getRecords.callCount, 2)
-          console.log('waited', getRecords.callCount)
-        })
+      await reader.readShard('shard-iterator-3')
+      assert.strictEqual(getRecords.callCount, 2)
     })
 
-    it('parses incoming records', () => {
+    it('parses incoming records', async () => {
       expect(3)
       const record = {
         Data: '{"foo":"bar"}',
@@ -269,20 +264,13 @@ describe('KinesisReadable', () => {
         parser: JSON.parse,
       })
 
-      return reader.readShard('shard-iterator-5')
-        .then(() => {
-          assert.ok(reader._readableState.objectMode)
-          assert.equal(reader._readableState.buffer.length, 1)
-          if (reader._readableState.buffer.head) {
-            assert.deepEqual(reader._readableState.buffer.head.data, {foo: 'bar'})
-          } else {
-            // NODE4
-            assert.deepEqual(reader._readableState.buffer[0], {foo: 'bar'})
-          }
-        })
+      await reader.readShard('shard-iterator-5')
+      assert.ok(reader._readableState.objectMode)
+      assert.equal(reader._readableState.buffer.length, 1)
+      assert.deepEqual(reader._readableState.buffer.head.data, {foo: 'bar'})
     })
 
-    it('parser exceptions are passed through', () => {
+    it('parser exceptions are passed through', async () => {
       expect(1)
       const record = {
         Data: '{"foo":"bar"}',
@@ -293,13 +281,12 @@ describe('KinesisReadable', () => {
         parser: () => { throw new Error('lolwut') },
       })
 
-      return reader.readShard('shard-iterator-6')
-        .then(() => {
-          assert(false, 'reader should have thrown')
-        })
-        .catch((err) => {
-          assert.equal(err.message, 'lolwut')
-        })
+      try {
+        await reader.readShard('shard-iterator-6')
+        assert(0)
+      } catch (err) {
+        assert.equal(err.message, 'lolwut')
+      }
     })
   })
 
