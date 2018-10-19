@@ -21,12 +21,9 @@ const expect = chai.expect
 
 describe('KinesisWritable', function () {
   let client
-  let sandbox
   let stream
 
   beforeEach(function () {
-    sandbox = sinon.sandbox.create()
-
     client = {
       putRecords: sinon.stub(),
       constructor: {
@@ -42,7 +39,7 @@ describe('KinesisWritable', function () {
   })
 
   afterEach(function () {
-    sandbox.restore()
+    sinon.restore()
   })
 
   describe('constructor', function () {
@@ -51,7 +48,7 @@ describe('KinesisWritable', function () {
         new KinesisWritable()
         assert.ok(false)
       } catch (err) {
-        assert.equal(err.message, 'client is required')
+        assert.strictEqual(err.message, 'client is required')
       }
     })
 
@@ -60,7 +57,7 @@ describe('KinesisWritable', function () {
         new KinesisWritable({})
         assert.ok(false)
       } catch (err) {
-        assert.equal(err.message, 'streamName is required')
+        assert.strictEqual(err.message, 'streamName is required')
       }
     })
 
@@ -73,7 +70,7 @@ describe('KinesisWritable', function () {
   describe('getPartitionKey', function () {
     it('should be called with the current record being added', function (done) {
       client.putRecords = AWSPromise.resolves(successResponseFixture)
-      sandbox.stub(stream, 'getPartitionKey').returns('1234')
+      sinon.stub(stream, 'getPartitionKey').returns('1234')
 
       stream.on('finish', () => {
         expect(stream.getPartitionKey).to.have.been.calledWith(recordsFixture[0])
@@ -90,10 +87,10 @@ describe('KinesisWritable', function () {
         return 'custom-partition'
       }
 
-      sandbox.spy(stream, 'getPartitionKey')
+      sinon.spy(stream, 'getPartitionKey')
 
       stream.on('finish', () => {
-        assert.equal(stream.getPartitionKey(), 'custom-partition')
+        assert.strictEqual(stream.getPartitionKey(), 'custom-partition')
         done()
       })
 
@@ -106,26 +103,26 @@ describe('KinesisWritable', function () {
       const stream = new KinesisWritable(client, 'streamName', {
         highWaterMark: 5,
       })
-      const record = {Data: ''}
+      const record = { Data: '' }
       stream.queue = [record, record, record, record, record, record]
-      assert.equal(stream.getQueueSpliceCount(), 5)
+      assert.strictEqual(stream.getQueueSpliceCount(), 5)
     })
 
     it('limits big records to collectionMaxSize', () => {
       const stream = new KinesisWritable(client, 'streamName', {
         highWaterMark: 500,
       })
-      const record = {Data: ' '}
+      const record = { Data: ' ' }
       stream.queue = [record, record, record, record, record, record]
       stream.collectionMaxSize = 5
-      assert.equal(stream.getQueueSpliceCount(), 5)
+      assert.strictEqual(stream.getQueueSpliceCount(), 5)
     })
   })
 
   describe('_write', function () {
     it('should write to Kinesis when stream is closed', function (done) {
       client.putRecords = AWSPromise.resolves(successResponseFixture)
-      sandbox.stub(stream, 'getPartitionKey').returns('1234')
+      sinon.stub(stream, 'getPartitionKey').returns('1234')
 
       stream.on('finish', () => {
         expect(client.putRecords).to.have.been.calledOnce
@@ -177,16 +174,16 @@ describe('KinesisWritable', function () {
 
     it('should retry failed records', function (done) {
       let putRecordsCount = 0
-      sandbox.stub(stream, 'getPartitionKey').returns('1234')
+      sinon.stub(stream, 'getPartitionKey').returns('1234')
 
       client.putRecords = AWSPromise.resolves(failedResponseFixture)
-      client.putRecords.onCall(1).returns({promise: () => Promise.resolve(successAfterFailedResponseFixture)})
+      client.putRecords.onCall(1).returns({ promise: () => Promise.resolve(successAfterFailedResponseFixture) })
       stream.once('error', () => {
         expect(stream.queue).to.deep.equal([ { someKey: 2 }, { someKey: 4 } ])
       })
       stream.on('kinesis.putRecords', () => putRecordsCount++)
       stream.on('finish', () => {
-        assert.equal(client.putRecords.callCount, 2)
+        assert.strictEqual(client.putRecords.callCount, 2)
 
         expect(client.putRecords.secondCall).to.have.been.calledWith({
           Records: [{ Data: '{"someKey":2}', PartitionKey: '1234' }, { Data: '{"someKey":4}', PartitionKey: '1234' }],
