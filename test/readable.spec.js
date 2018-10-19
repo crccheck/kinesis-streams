@@ -143,29 +143,26 @@ describe('KinesisReadable', () => {
   })
 
   describe('getShardIterator', () => {
-    it('gets shard iterator', () => {
+    it('gets shard iterator', async () => {
       expect(1)
       const reader = new main.KinesisReadable(client, 'stream-name')
       client.getShardIterator = AWSPromise.resolves({ShardIterator: 'shard iterator'})
 
-      return reader.getShardIterator('shard-id')
-        .then((data) => {
-          assert.strictEqual(data, 'shard iterator')
-        })
+      const data = await reader.getShardIterator('shard-id')
+      assert.strictEqual(data, 'shard iterator')
     })
 
-    it('handles errors', () => {
+    it('handles errors', async () => {
       expect(1)
       const reader = new main.KinesisReadable(client, 'stream-name')
       client.getShardIterator = AWSPromise.rejects(new Error('lol error'))
 
-      return reader.getShardIterator('shard-id')
-        .then((data) => {
-          assert.ok(false)
-        })
-        .catch((err) => {
-          assert.strictEqual(err.message, 'lol error')
-        })
+      try {
+        await reader.getShardIterator('shard-id')
+        assert.ok(false)
+      } catch (err) {
+        assert.strictEqual(err.message, 'lol error')
+      }
     })
   })
 
