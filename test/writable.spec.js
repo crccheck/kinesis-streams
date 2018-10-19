@@ -106,7 +106,7 @@ describe('KinesisWritable', function () {
       const stream = new KinesisWritable(client, 'streamName', {
         highWaterMark: 5,
       })
-      const record = {Data: ''}
+      const record = { Data: '' }
       stream.queue = [record, record, record, record, record, record]
       assert.equal(stream.getQueueSpliceCount(), 5)
     })
@@ -115,7 +115,7 @@ describe('KinesisWritable', function () {
       const stream = new KinesisWritable(client, 'streamName', {
         highWaterMark: 500,
       })
-      const record = {Data: ' '}
+      const record = { Data: ' ' }
       stream.queue = [record, record, record, record, record, record]
       stream.collectionMaxSize = 5
       assert.equal(stream.getQueueSpliceCount(), 5)
@@ -180,7 +180,7 @@ describe('KinesisWritable', function () {
       sandbox.stub(stream, 'getPartitionKey').returns('1234')
 
       client.putRecords = AWSPromise.resolves(failedResponseFixture)
-      client.putRecords.onCall(1).returns({promise: () => Promise.resolve(successAfterFailedResponseFixture)})
+      client.putRecords.onCall(1).returns({ promise: () => Promise.resolve(successAfterFailedResponseFixture) })
       stream.once('error', () => {
         expect(stream.queue).to.deep.equal([ { someKey: 2 }, { someKey: 4 } ])
       })

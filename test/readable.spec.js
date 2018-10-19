@@ -37,7 +37,7 @@ describe('KinesisReadable', () => {
   let sandbox
 
   beforeEach(() => {
-    client = {constructor: {__super__: {serviceIdentifier: 'kinesis'}}}
+    client = { constructor: { __super__: { serviceIdentifier: 'kinesis' } } }
     sandbox = sinon.sandbox.create()
   })
 
@@ -93,7 +93,7 @@ describe('KinesisReadable', () => {
 
     it('sets arguments', () => {
       expect(4)
-      const reader = new main.KinesisReadable(client, 'stream-name', {foo: 'bar'})
+      const reader = new main.KinesisReadable(client, 'stream-name', { foo: 'bar' })
       assert.ok(reader)
       assert.equal(reader.streamName, 'stream-name')
       assert.equal(reader.options.foo, 'bar')
@@ -104,7 +104,7 @@ describe('KinesisReadable', () => {
   describe('getShardId', () => {
     it('throws when there are no shards', () => {
       expect(1)
-      client.describeStream = AWSPromise.resolves({StreamDescription: {Shards: []}})
+      client.describeStream = AWSPromise.resolves({ StreamDescription: { Shards: [] } })
       const reader = new main.KinesisReadable(client, 'stream-name')
 
       return reader.getShardId()
@@ -118,7 +118,7 @@ describe('KinesisReadable', () => {
 
     it('gets shard id', () => {
       expect(1)
-      client.describeStream = AWSPromise.resolves({StreamDescription: {Shards: [{ShardId: 'shard-id'}]}})
+      client.describeStream = AWSPromise.resolves({ StreamDescription: { Shards: [{ ShardId: 'shard-id' }] } })
       const reader = new main.KinesisReadable(client, 'stream-name')
 
       return reader.getShardId()
@@ -146,7 +146,7 @@ describe('KinesisReadable', () => {
     it('gets shard iterator', async () => {
       expect(1)
       const reader = new main.KinesisReadable(client, 'stream-name')
-      client.getShardIterator = AWSPromise.resolves({ShardIterator: 'shard iterator'})
+      client.getShardIterator = AWSPromise.resolves({ ShardIterator: 'shard iterator' })
 
       const data = await reader.getShardIterator('shard-id')
       assert.strictEqual(data, 'shard iterator')
@@ -169,8 +169,8 @@ describe('KinesisReadable', () => {
   describe('_startKinesis', () => {
     it('passes shard iterator options ignoring extras', async () => {
       expect(4)
-      client.describeStream = AWSPromise.resolves({StreamDescription: {Shards: [{ShardId: 'shard id'}]}})
-      client.getShardIterator = AWSPromise.resolves({ShardIterator: 'shard iterator'})
+      client.describeStream = AWSPromise.resolves({ StreamDescription: { Shards: [{ ShardId: 'shard id' }] } })
+      client.getShardIterator = AWSPromise.resolves({ ShardIterator: 'shard iterator' })
       sandbox.stub(main.KinesisReadable.prototype, 'readShard')
       const options = {
         foo: 'bar',
@@ -192,7 +192,7 @@ describe('KinesisReadable', () => {
     it('emits error when there is an error', async () => {
       expect(1)
       client.describeStream = AWSPromise.rejects(new Error('lol error'))
-      const reader = new main.KinesisReadable(client, 'stream name', {foo: 'bar'})
+      const reader = new main.KinesisReadable(client, 'stream name', { foo: 'bar' })
 
       reader.once('error', (err) => {
         assert.equal(err.message, 'lol error')
@@ -205,8 +205,8 @@ describe('KinesisReadable', () => {
   describe('readShard', () => {
     it('exits when shard is closed', async () => {
       expect(1)
-      client.getRecords = AWSPromise.resolves({Records: []})
-      const reader = new main.KinesisReadable(client, 'stream name', {foo: 'bar'})
+      client.getRecords = AWSPromise.resolves({ Records: [] })
+      const reader = new main.KinesisReadable(client, 'stream name', { foo: 'bar' })
 
       reader.once('error', () => {
         assert.ok(false, 'this should never run')
@@ -223,10 +223,10 @@ describe('KinesisReadable', () => {
         SequenceNumber: 'seq-1',
       }
       const getRecords = sinon.stub()
-      getRecords.onCall(0).returns({promise: () => Promise.resolve({Records: [record], NextShardIterator: 'shard-iterator-4'})})
-      getRecords.onCall(1).returns({promise: () => Promise.resolve({Records: []})})
+      getRecords.onCall(0).returns({ promise: () => Promise.resolve({ Records: [record], NextShardIterator: 'shard-iterator-4' }) })
+      getRecords.onCall(1).returns({ promise: () => Promise.resolve({ Records: [] }) })
       client.getRecords = getRecords
-      const reader = new main.KinesisReadable(client, 'stream name', {interval: 0})
+      const reader = new main.KinesisReadable(client, 'stream name', { interval: 0 })
 
       reader.once('error', () => {
         assert(0)
@@ -253,7 +253,7 @@ describe('KinesisReadable', () => {
       await reader.readShard('shard-iterator-5')
       assert.ok(reader._readableState.objectMode)
       assert.equal(reader._readableState.buffer.length, 1)
-      assert.deepEqual(reader._readableState.buffer.head.data, {foo: 'bar'})
+      assert.deepEqual(reader._readableState.buffer.head.data, { foo: 'bar' })
     })
 
     it('emits errors', async () => {
@@ -291,7 +291,7 @@ describe('KinesisReadable', () => {
   describe('_read', () => {
     it('only calls _startKinesis once', () => {
       expect(1)
-      const reader = new main.KinesisReadable(client, 'stream name', {foo: 'bar'})
+      const reader = new main.KinesisReadable(client, 'stream name', { foo: 'bar' })
       sandbox.stub(reader, '_startKinesis').returns(Promise.resolve())
 
       reader._read()
