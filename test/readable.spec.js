@@ -170,7 +170,7 @@ describe('KinesisReadable', () => {
   })
 
   describe('_startKinesis', () => {
-    it('passes shard iterator options ignoring extras', () => {
+    it('passes shard iterator options ignoring extras', async () => {
       expect(4)
       client.describeStream = AWSPromise.resolves({StreamDescription: {Shards: [{ShardId: 'shard id'}]}})
       client.getShardIterator = AWSPromise.resolves({ShardIterator: 'shard iterator'})
@@ -183,16 +183,16 @@ describe('KinesisReadable', () => {
       }
       const reader = new main.KinesisReadable(client, 'stream name', options)
 
-      return reader._startKinesis().then(() => {
-        const params = client.getShardIterator.args[0][0]
-        assert.equal(params.ShardIteratorType, 'SHIT')
-        assert.equal(params.Timestamp, '0')
-        assert.equal(params.StartingSequenceNumber, 'SSN')
-        assert.equal(params.foo, undefined)
-      })
+      await reader._startKinesis()
+
+      const params = client.getShardIterator.args[0][0]
+      assert.equal(params.ShardIteratorType, 'SHIT')
+      assert.equal(params.Timestamp, '0')
+      assert.equal(params.StartingSequenceNumber, 'SSN')
+      assert.equal(params.foo, undefined)
     })
 
-    it('emits error when there is an error', () => {
+    it('emits error when there is an error', async () => {
       expect(1)
       client.describeStream = AWSPromise.rejects(new Error('lol error'))
       const reader = new main.KinesisReadable(client, 'stream name', {foo: 'bar'})
@@ -201,18 +201,7 @@ describe('KinesisReadable', () => {
         assert.equal(err.message, 'lol error')
       })
 
-      return reader._startKinesis('stream name', {})
-    })
-
-    // $FlowFixMe
-    xit('logs when there is an error', () => {
-      client.describeStream = AWSPromise.rejects(new Error('lol error'))
-      const reader = new main.KinesisReadable(client, 'stream name', {foo: 'bar'})
-
-      return reader._startKinesis('stream name', {})
-        .then(() => {
-          assert.equal(console.log.args[0][0].message, 'lol error')
-        })
+      await reader._startKinesis('stream name', {})
     })
   })
 
