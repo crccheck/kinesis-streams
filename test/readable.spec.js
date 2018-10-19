@@ -270,6 +270,18 @@ describe('KinesisReadable', () => {
       assert.deepEqual(reader._readableState.buffer.head.data, {foo: 'bar'})
     })
 
+    it('emits errors', async () => {
+      expect(1)
+      client.getRecords = sinon.stub().returns({ promise: () => Promise.reject(new Error('AWS is down')) })
+      const reader = new main.KinesisReadable(client, 'stream name', {})
+
+      reader.once('error', (err) => {
+        assert.strictEqual(err.message, 'AWS is down')
+      })
+
+      await reader.readShard('shard-iterator-5')
+    })
+
     it('parser exceptions are passed through', async () => {
       expect(1)
       const record = {
