@@ -107,7 +107,7 @@ describe('KinesisReadable', () => {
       client.describeStream = AWSPromise.resolves({StreamDescription: {Shards: []}})
       const reader = new main.KinesisReadable(client, 'stream-name')
 
-      return reader.getShardId(client)
+      return reader.getShardId()
         .then((data) => {
           assert.ok(false)
         })
@@ -198,7 +198,7 @@ describe('KinesisReadable', () => {
         assert.equal(err.message, 'lol error')
       })
 
-      await reader._startKinesis('stream name', {})
+      await reader._startKinesis()
     })
   })
 
