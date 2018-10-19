@@ -51,7 +51,7 @@ describe('KinesisWritable', function () {
         new KinesisWritable()
         assert.ok(false)
       } catch (err) {
-        assert.equal(err.message, 'client is required')
+        assert.strictEqual(err.message, 'client is required')
       }
     })
 
@@ -60,7 +60,7 @@ describe('KinesisWritable', function () {
         new KinesisWritable({})
         assert.ok(false)
       } catch (err) {
-        assert.equal(err.message, 'streamName is required')
+        assert.strictEqual(err.message, 'streamName is required')
       }
     })
 
@@ -93,7 +93,7 @@ describe('KinesisWritable', function () {
       sandbox.spy(stream, 'getPartitionKey')
 
       stream.on('finish', () => {
-        assert.equal(stream.getPartitionKey(), 'custom-partition')
+        assert.strictEqual(stream.getPartitionKey(), 'custom-partition')
         done()
       })
 
@@ -108,7 +108,7 @@ describe('KinesisWritable', function () {
       })
       const record = { Data: '' }
       stream.queue = [record, record, record, record, record, record]
-      assert.equal(stream.getQueueSpliceCount(), 5)
+      assert.strictEqual(stream.getQueueSpliceCount(), 5)
     })
 
     it('limits big records to collectionMaxSize', () => {
@@ -118,7 +118,7 @@ describe('KinesisWritable', function () {
       const record = { Data: ' ' }
       stream.queue = [record, record, record, record, record, record]
       stream.collectionMaxSize = 5
-      assert.equal(stream.getQueueSpliceCount(), 5)
+      assert.strictEqual(stream.getQueueSpliceCount(), 5)
     })
   })
 
@@ -186,7 +186,7 @@ describe('KinesisWritable', function () {
       })
       stream.on('kinesis.putRecords', () => putRecordsCount++)
       stream.on('finish', () => {
-        assert.equal(client.putRecords.callCount, 2)
+        assert.strictEqual(client.putRecords.callCount, 2)
 
         expect(client.putRecords.secondCall).to.have.been.calledWith({
           Records: [{ Data: '{"someKey":2}', PartitionKey: '1234' }, { Data: '{"someKey":4}', PartitionKey: '1234' }],
