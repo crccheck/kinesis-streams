@@ -43,7 +43,7 @@
     "eslint-plugin-standard": "^4.0.0",
     "flow-bin": "^0.83.0",
     "husky": "^0.14.3",
-    "mocha": "^4.1.0",
+    "mocha": "^5.2.0",
     "nyc": "^13.1.0",
     "sinon": "^7.0.0",
     "sinon-chai": "^3.2.0",
