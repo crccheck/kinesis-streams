@@ -221,7 +221,7 @@ describe('KinesisReadable', () => {
       getRecords.onCall(1).returns({ promise: () => Promise.resolve({ Records: [] }) })
       client.getRecords = getRecords
       const reader = new main.KinesisReadable(client, 'stream name', { interval: 0 })
-      // $FlowFixMe
+      // $FlowFixMe // Keep the stream from starting normally
       reader._read = () => {}
       reader.once('error', () => {
         assert(false)
@@ -245,7 +245,7 @@ describe('KinesisReadable', () => {
       const reader = new main.KinesisReadable(client, 'stream name', {
         parser: JSON.parse,
       })
-      // $FlowFixMe
+      // $FlowFixMe // Keep the stream from starting normally
       reader._read = () => {}
 
       await reader.readShard('shard-iterator-5')
