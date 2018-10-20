@@ -221,15 +221,17 @@ describe('KinesisReadable', () => {
       getRecords.onCall(1).returns({ promise: () => Promise.resolve({ Records: [] }) })
       client.getRecords = getRecords
       const reader = new main.KinesisReadable(client, 'stream name', { interval: 0 })
-
+      // $FlowFixMe
+      reader._read = () => {}
       reader.once('error', () => {
-        assert(0)
+        assert(false)
       })
       reader.once('checkpoint', (seq) => {
         assert.strictEqual(seq, 'seq-1')
       })
 
       await reader.readShard('shard-iterator-3')
+
       assert.strictEqual(getRecords.callCount, 2)
     })
 
@@ -243,8 +245,11 @@ describe('KinesisReadable', () => {
       const reader = new main.KinesisReadable(client, 'stream name', {
         parser: JSON.parse,
       })
+      // $FlowFixMe
+      reader._read = () => {}
 
       await reader.readShard('shard-iterator-5')
+
       assert.ok(reader._readableState.objectMode)
       assert.strictEqual(reader._readableState.buffer.length, 1)
       assert.deepStrictEqual(reader._readableState.buffer.head.data, { foo: 'bar' })
