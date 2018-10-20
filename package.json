@@ -13,7 +13,7 @@
     "test": "nyc mocha",
     "tdd": "mocha --watch --reporter dot --bail",
     "changelog": "echo \"$(changelog-maker && cat CHANGELOG.md)\" > CHANGELOG.md",
-    "prepush": "npm test"
+    "pre-push": "npm test"
   },
   "keywords": [
     "aws",
@@ -34,6 +34,7 @@
   },
   "devDependencies": {
     "aws-sdk": "^2.339.0",
+    "captain-git-hook": "^2.0.0",
     "chai": "^4.2.0",
     "eslint": "^5.7.0",
     "eslint-config-standard": "^12.0.0",
@@ -42,7 +43,6 @@
     "eslint-plugin-promise": "^4.0.1",
     "eslint-plugin-standard": "^4.0.0",
     "flow-bin": "^0.83.0",
-    "husky": "^0.14.3",
     "mocha": "^5.2.0",
     "nyc": "^13.1.0",
     "sinon": "^7.0.0",
