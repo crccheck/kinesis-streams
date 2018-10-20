@@ -273,7 +273,7 @@ describe('KinesisReadable', () => {
 
       try {
         await reader.readShard('shard-iterator-6')
-        assert(0)
+        assert(false)
       } catch (err) {
         assert.strictEqual(err.message, 'lolwut')
       }
