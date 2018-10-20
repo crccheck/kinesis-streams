@@ -8,6 +8,9 @@ Kinesis Streams
 There once was a [Kinesis readable stream][kinesis-console-consumer] without a
 home, and a Kinesis writable stream without a home, so now they're roommates.
 
+NOTE: Kinesis was a bad idea, and we're switching to Kafka. So I'm not
+maintaining this library anymore.
+
 
 Installing
 ----------
