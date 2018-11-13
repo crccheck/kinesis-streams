@@ -1,6 +1,6 @@
 {
   "name": "kinesis-streams",
-  "version": "0.12.0",
+  "version": "0.11.0",
   "description": "Readable and writable streams for AWS Kinesis",
   "main": "lib/index.js",
   "engines": {
