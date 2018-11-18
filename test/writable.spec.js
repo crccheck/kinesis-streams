@@ -5,7 +5,7 @@ const { expect } = require('chai') // DEPRECATED, prefer `assert`
 const sinon = require('sinon')
 const streamArray = require('stream-array')
 
-const AWSPromise = require('./').AWSPromise
+const { AWSPromise } = require('./')
 const recordsFixture = require('./fixture/records')
 const successResponseFixture = require('./fixture/success-response')
 const failedResponseFixture = require('./fixture/failed-response')
