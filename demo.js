@@ -22,7 +22,7 @@ const { KinesisWritable } = require('kinesis-streams')
 
 const WAIT = 500
 
-const logger = bunyan.createLogger({name: 'demo', level: 'debug'})
+const logger = bunyan.createLogger({ name: 'demo', level: 'debug' })
 
 class NoiseReadable extends Readable {
   constructor (options = {}) {
@@ -42,7 +42,7 @@ class NoiseReadable extends Readable {
 }
 
 const client = new AWS.Kinesis()
-const stream = new KinesisWritable(client, process.argv[2] || 'demo', {logger, wait: WAIT})
+const stream = new KinesisWritable(client, process.argv[2] || 'demo', { logger, wait: WAIT })
 
 stream.on('kinesis.putRecords', (response) => {
   /* eslint-disable no-unused-vars */

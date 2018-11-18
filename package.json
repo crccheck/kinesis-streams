@@ -8,8 +8,8 @@
   },
   "scripts": {
     "start": "node lib/index.js",
-    "lint": "eslint lib test",
-    "pretest": "eslint lib test",
+    "lint": "eslint --report-unused-disable-directives .",
+    "posttest": "eslint --report-unused-disable-directives .",
     "test": "nyc mocha",
     "tdd": "mocha --watch --reporter dot --bail",
     "changelog": "echo \"$(changelog-maker && cat CHANGELOG.md)\" > CHANGELOG.md",
@@ -56,5 +56,8 @@
   "bugs": {
     "url": "https://github.com/crccheck/kinesis-streams/issues"
   },
-  "homepage": "https://github.com/crccheck/kinesis-streams#readme"
+  "homepage": "https://github.com/crccheck/kinesis-streams#readme",
+  "eslintIgnore": [
+    "flow-typed"
+  ]
 }
