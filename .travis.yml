@@ -3,9 +3,7 @@ node_js:
   - "11"
   - "10"
   - "8"
-cache:
-  directories:
-    - node_modules
+cache: npm
 addons:
  code_climate:
    repo_token: 3f8e52453d414ec26ca5ebcf710ceab3349acf736ce02491ec735beb08e97445
