@@ -1,4 +1,4 @@
-// @flow weak
+// @flow
 /* eslint-disable no-new */
 const assert = require('assert')
 const sinon = require('sinon')
@@ -33,7 +33,7 @@ afterEach(function () {
 })
 
 describe('KinesisReadable', () => {
-  let client
+  let client/*: Object */
 
   beforeEach(() => {
     client = { constructor: { __super__: { serviceIdentifier: 'kinesis' } } }
