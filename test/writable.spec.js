@@ -1,7 +1,6 @@
 // @flow
-/* eslint-disable no-new,no-unused-expressions */
+/* eslint-disable no-new */
 const assert = require('assert')
-const { expect } = require('chai') // DEPRECATED, prefer `assert`
 const sinon = require('sinon')
 const streamArray = require('stream-array')
 
@@ -58,7 +57,7 @@ describe('KinesisWritable', function () {
 
     it('should correct highWaterMark above 500', function () {
       const stream = new KinesisWritable({}, 'test', { highWaterMark: 501 })
-      expect(stream.collectionMaxCount).to.equal(500)
+      assert.strictEqual(stream.collectionMaxCount, 500)
     })
   })
 
@@ -174,7 +173,7 @@ describe('KinesisWritable', function () {
       client.putRecords = AWSPromise.resolves(failedResponseFixture)
       client.putRecords.onCall(1).returns({ promise: () => Promise.resolve(successAfterFailedResponseFixture) })
       stream.once('error', () => {
-        expect(stream.queue).to.deep.equal([ { someKey: 2 }, { someKey: 4 } ])
+        assert.deepStrictEqual(stream.queue, [ { someKey: 2 }, { someKey: 4 } ])
       })
       stream.on('kinesis.putRecords', () => putRecordsCount++)
       stream.on('finish', () => {
