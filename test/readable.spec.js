@@ -203,6 +203,38 @@ describe('KinesisReadable', () => {
       assert.strictEqual(reader.iterators.size, 0)
     })
 
+    it('can get a new list of shards when all shards are closed', async () => {
+      expect(3)
+
+      let describeCalled = 0
+      client.describeStream = sinon.stub().returns({
+        promise: () =>
+          Promise.resolve({
+            StreamDescription: {
+              Shards: describeCalled++ === 0 ? [{
+                ShardId: 'shard-2',
+              }] : [],
+            },
+          }),
+      })
+      client.getShardIterator = AWSPromise.resolves({
+        ShardIterator: 'shard-iterator-2',
+      })
+      client.getRecords = AWSPromise.resolves({ Records: [] })
+      const reader = new main.KinesisReadable(client, 'stream name', {
+        foo: 'bar',
+        restartOnClose: true,
+      })
+
+      reader.once('error', (err) => {
+        assert.strictEqual(err.message, 'No shards!')
+      })
+
+      await reader.readShard('shard-iterator-1')
+      assert.strictEqual(reader.iterators.size, 0)
+      assert.strictEqual(describeCalled, 2)
+    })
+
     it('continues to read open shard', async () => {
       expect(2)
       const record = {
@@ -258,6 +290,40 @@ describe('KinesisReadable', () => {
       })
 
       await reader.readShard('shard-iterator-5')
+    })
+
+    it('keeps trying to get records if error.retryable', async () => {
+      expect(2)
+
+      let callCount = 0
+      client.getRecords = sinon.stub().returns({
+        promise: () => {
+          callCount++
+          // only throw an error on the first call
+          if (callCount >= 2) {
+            return Promise.resolve({
+              Records: [],
+              NextShardIterator: null,
+            })
+          }
+          const err = new Error('AWS is down but try again')
+          err.retryable = true
+          return Promise.reject(err)
+        },
+      })
+      const reader = new main.KinesisReadable(client, 'stream name', {
+        interval: 100,
+      })
+
+      let errorEmitted = 0
+      reader.once('error', (err) => {
+        errorEmitted++
+        assert.strictEqual(err.message, 'AWS is down but try again')
+      })
+
+      await reader.readShard('shard-iterator-5')
+
+      assert.strictEqual(errorEmitted, 1)
     })
 
     it('parser exceptions are passed through', async () => {
