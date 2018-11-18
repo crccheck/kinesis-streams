@@ -1,4 +1,4 @@
-// @flow weak
+// @flow
 /* eslint-disable no-new,no-unused-expressions */
 const assert = require('assert')
 const { expect } = require('chai') // DEPRECATED, prefer `assert`
