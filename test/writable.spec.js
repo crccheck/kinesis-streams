@@ -1,9 +1,8 @@
 // @flow weak
 /* eslint-disable no-new,no-unused-expressions */
 const assert = require('assert')
-const chai = require('chai')
+const { expect } = require('chai') // DEPRECATED, prefer `assert`
 const sinon = require('sinon')
-const sinonChai = require('sinon-chai')
 const streamArray = require('stream-array')
 
 const AWSPromise = require('./').AWSPromise
@@ -13,10 +12,6 @@ const failedResponseFixture = require('./fixture/failed-response')
 const successAfterFailedResponseFixture = require('./fixture/success-after-failed-response')
 const writeFixture = require('./fixture/write-fixture')
 const { KinesisWritable } = require('../')
-
-chai.use(sinonChai)
-
-const expect = chai.expect
 
 
 describe('KinesisWritable', function () {
@@ -73,7 +68,7 @@ describe('KinesisWritable', function () {
       sinon.stub(stream, 'getPartitionKey').returns('1234')
 
       stream.on('finish', () => {
-        expect(stream.getPartitionKey).to.have.been.calledWith(recordsFixture[0])
+        sinon.assert.calledWith(stream.getPartitionKey, recordsFixture[0])
         done()
       })
 
@@ -125,9 +120,9 @@ describe('KinesisWritable', function () {
       sinon.stub(stream, 'getPartitionKey').returns('1234')
 
       stream.on('finish', () => {
-        expect(client.putRecords).to.have.been.calledOnce
+        sinon.assert.calledOnce(client.putRecords)
 
-        expect(client.putRecords).to.have.been.calledWith({
+        sinon.assert.calledWith(client.putRecords, {
           Records: writeFixture,
           StreamName: 'streamName',
         })
@@ -142,7 +137,7 @@ describe('KinesisWritable', function () {
       client.putRecords = AWSPromise.resolves(successResponseFixture)
 
       stream.on('finish', () => {
-        expect(client.putRecords).to.have.been.calledOnce
+        sinon.assert.calledOnce(client.putRecords)
 
         done()
       })
@@ -162,10 +157,10 @@ describe('KinesisWritable', function () {
       }
 
       stream.write(recordsFixture[0], () => {
-        expect(client.putRecords).to.not.have.been.called
+        sinon.assert.notCalled(client.putRecords)
 
         stream.write(recordsFixture[0], () => {
-          expect(client.putRecords).to.have.been.calledOnce
+          sinon.assert.calledOnce(client.putRecords)
 
           done()
         })
@@ -185,12 +180,12 @@ describe('KinesisWritable', function () {
       stream.on('finish', () => {
         assert.strictEqual(client.putRecords.callCount, 2)
 
-        expect(client.putRecords.secondCall).to.have.been.calledWith({
+        sinon.assert.calledWith(client.putRecords.getCall(1), {
           Records: [{ Data: '{"someKey":2}', PartitionKey: '1234' }, { Data: '{"someKey":4}', PartitionKey: '1234' }],
           StreamName: 'streamName',
         })
 
-        expect(putRecordsCount).to.equal(2)
+        assert.strictEqual(putRecordsCount, 2)
 
         done()
       })
