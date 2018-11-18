@@ -1,5 +1,4 @@
-.nyc_output
 .idea
-coverage/
+.nyc_output
 flow-typed/
 node_modules/
