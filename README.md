@@ -82,7 +82,7 @@ Readable stream
         const reader = new KinesisReadable(client, streamName, {parser: JSON.parse})
         reader.on('data', console.log(data.id))
 
-* `options.restartOnClose: boolean` If this is set, then the stream will try to rediscover new shards once all current shards have been closed.
+* `options.restartOnClose: boolean` (default: `false`) Rediscover new shards once all current shards have been closed
 * And any [getShardIterator] parameter
 
 ### Custom events
